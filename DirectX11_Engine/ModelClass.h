@@ -1,0 +1,83 @@
+//////////////////////////////////////////////////////////////////////////
+// ModelClass : 3D 객체들의 기하학적인 부분을 다루는 클래스 ( 3D모델들의 복잡한 기하학들을 캡슐화하는 클래스 )
+
+/* 
+	Tutorial 4
+	. 녹색 삼각형 하나를 만들기 위한 데이터를 만든다.
+	  이 삼각형이 화면에 그려지기 위해 필요한 정점 버퍼와 인덱스 버퍼도 만든다.
+
+	Tutorial 5
+	텍스쳐링 지원
+*/
+
+
+#pragma once
+#ifndef _MODELCLASS_H_
+#define _MODELCLASS_H_
+
+#include <d3d11.h>
+#include <D3DX10math.h>
+
+// T5
+#include "TextureClass.h"
+
+class CModelClass
+{
+private:
+
+	// 정점버퍼에 사용할 정점의 구조체 선언 ( ColorShaderClass에서 사용할 것과 구조가 같아야 한다.)
+
+	// T4
+// 	struct VertexType 
+// 	{
+// 		D3DXVECTOR3 position;
+// 		D3DXVECTOR4 color;
+// 	};
+
+	// T5
+	struct VertexType
+	{
+		D3DXVECTOR3 position;
+		D3DXVECTOR2 texture;
+	};
+
+
+public:
+	CModelClass(void);
+	CModelClass(const CModelClass& other);
+	~CModelClass(void);
+
+	bool Initialize(ID3D11Device* _device);
+	bool Initialize(ID3D11Device* _device, WCHAR* _filename);	// T5 추가
+	void Shutdown();
+	void Render(ID3D11DeviceContext* _devContext);
+
+	int GetIndexCount();
+
+	// T5
+	ID3D11ShaderResourceView* GetTexture();
+
+
+private:
+	bool InitializeBuffers(ID3D11Device* _device);
+	void ShutdownBuffers();
+	void RenderBuffers(ID3D11DeviceContext* _devContext);
+
+	// T5
+	bool LoadTexture(ID3D11Device* _device, WCHAR* _filename);
+	void ReleaseTexture();
+
+private:
+	ID3D11Buffer *m_pVertexBuffer;
+	ID3D11Buffer *m_pIndexBuffer;
+	int	m_nVertexCount;
+	int m_nIndexCount;
+
+	// T5
+	CTextureClass* m_pTexture;
+};
+
+#endif
+
+
+
