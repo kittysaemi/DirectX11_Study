@@ -7,7 +7,10 @@
 	  이 삼각형이 화면에 그려지기 위해 필요한 정점 버퍼와 인덱스 버퍼도 만든다.
 
 	Tutorial 5
-	텍스쳐링 지원
+	텍스쳐
+
+	Tutorial 6
+	조명
 */
 
 
@@ -35,10 +38,18 @@ private:
 // 	};
 
 	// T5
+// 	struct VertexType
+// 	{
+// 		D3DXVECTOR3 position;
+// 		D3DXVECTOR2 texture;
+// 	};
+
+	// T6
 	struct VertexType
 	{
 		D3DXVECTOR3 position;
 		D3DXVECTOR2 texture;
+		D3DXVECTOR3 normal;
 	};
 
 

@@ -85,7 +85,7 @@ bool CModelClass::InitializeBuffers(ID3D11Device* _device)
 		정점과 인덱스 데이터를 담아둘 두개의 임시 배열을 만들고 나중에 최종 버퍼를 생설할때 사용하도록 한다.
 	*/
 
-	bool Triangle = false;
+	bool Triangle = true;
 
 	if(Triangle)
 	{
@@ -197,6 +197,15 @@ bool CModelClass::InitializeBuffers(ID3D11Device* _device)
 
 	for(int i=0; i<m_nIndexCount; i++)
 	{
+		// T6
+		/*
+			각 정점은 빛의 계산을 위하여 연관된 법선을 가지게 된다.
+			법선은 도형의 표면에 수직하는 선이기 떄문에 표면이 바라보고 있는 방향을 정확히 계산할 수 있따.
+			코드의 간단함을 유지하기 위해 법선이 시청자에게로 향하도록 각 정점의 법선의 Z성분을 -1.0f로 하였다
+		*/
+		_vertices[i].normal = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+		// T6 End
+				
 		_indices[i] = i;
 	}
 

@@ -48,6 +48,12 @@
     <ClCompile Include="Textureshaderclass.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="LightClass.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="LightshaderClass.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InputClass.h">
@@ -77,6 +83,12 @@
     <ClInclude Include="Textureshaderclass.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="LightshaderClass.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="LightClass.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Tutorial_Guid_Explan.txt" />
@@ -90,6 +102,12 @@
       <Filter>HLSL</Filter>
     </None>
     <None Include="Texture.vs">
+      <Filter>HLSL</Filter>
+    </None>
+    <None Include="Light.ps">
+      <Filter>HLSL</Filter>
+    </None>
+    <None Include="Light.vs">
       <Filter>HLSL</Filter>
     </None>
   </ItemGroup>

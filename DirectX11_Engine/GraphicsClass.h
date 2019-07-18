@@ -17,12 +17,16 @@
 //#include "ColorShaderClass.h" 
 
 // tutorial 5
-#include "Textureshaderclass.h"
+//#include "Textureshaderclass.h"
+
+// tutorial 6
+#include "LightshaderClass.h"	
+#include "LightClass.h"
 
 //////////////////////////////////////////////////////////////////////////
 
 const bool FULL_SCREEN = true;//true;
-const bool VSYNC_ENABLED = true;//false;
+const bool VSYNC_ENABLED = false;//false;
 const float SCREEN_DEPTH = 1000.0f;
 const float SCREEN_NEAR = 0.1f;
 
@@ -42,6 +46,7 @@ public:
 
 private:
 	bool Render();
+	bool Render(float _rotation);	// T6
 
 	// tutorial 3 - T3
 	CD3DClass* m_D3D;
@@ -52,7 +57,17 @@ private:
 	//CColorShaderClass * m_ColorShader; 
 
 	// T5
-	CTextureshaderclass * m_TextureShader; 
+	//CTextureshaderclass * m_TextureShader; 
+
+	// T6
+	CLightshaderClass* m_pLightShader;
+	CLightClass* m_pLight;
+
+	// saemi
+	float backColorR;
+	float backColorG;
+	float backColorB;
+	float backColorA;
 };
 
 

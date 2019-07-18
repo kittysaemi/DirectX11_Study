@@ -12,7 +12,18 @@ CGraphicsClass::CGraphicsClass(void)
 	//m_ColorShader = 0;
 
 	// T5
-	m_TextureShader = 0;
+	//m_TextureShader = 0;
+
+	// T6
+	m_pLightShader = 0;
+	m_pLight = 0;
+
+	// saemi			// Yellow	// gray
+	backColorR = 0.5f;	// 0xff		// 0x5
+	backColorG = 0.6f;	// 0xff		// 0x6
+	backColorB = 0.0f;	// 0x00		// 0x5
+	backColorA = 1.0f;	
+
 }
 
 CGraphicsClass::CGraphicsClass(const CGraphicsClass& other)
@@ -95,17 +106,44 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 	
 	// T5
 	// create the texture shader object.
-	m_TextureShader = new CTextureshaderclass;
-	if(!m_TextureShader)
+// 	m_TextureShader = new CTextureshaderclass;
+// 	if(!m_TextureShader)
+// 	{
+// 		return false;
+// 	}
+// 
+// 	// Initalize the texture shader object.
+// 	if(!m_TextureShader->Initialize(m_D3D->GetDevice(), hWnd))
+// 	{
+// 		return false;
+// 	}
+
+	// T6
+	// Create the light shader object.
+	m_pLightShader = new CLightshaderClass;
+	if(!m_pLightShader)
 	{
 		return false;
 	}
 
-	// Initalize the texture shader object.
-	if(!m_TextureShader->Initialize(m_D3D->GetDevice(), hWnd))
+	// Initialize the light shader object.
+	if(!m_pLightShader->Initialize(m_D3D->GetDevice(), hWnd))
 	{
 		return false;
 	}
+
+	// Create the light object.
+	m_pLight = new CLightClass;
+	if(!m_pLight)
+	{
+		return false;
+	}
+
+	// 조명의 색상을 자주색으로 하고 그 방향을 z축의 양의 값으로 합니다.
+	// Initialize the light object.
+	m_pLight->SetDiffuseColor(1.0f, 0.0f, 1.0f, 1.0f);
+	m_pLight->SetDirection(0.0f, 0.0f, 1.0f);
+
 
 	return true;
 
@@ -116,13 +154,27 @@ void CGraphicsClass::Shutdown()
 	// Release the thing object.
 
 	//////////////////////////////////////////////////////////////////////////
-	// T5
-	if(m_TextureShader)
+	// T6
+	if(m_pLight)
 	{
-		m_TextureShader->Shutdown();
-		delete m_TextureShader;
-		m_TextureShader = 0;
+		delete m_pLight;
+		m_pLight = 0;
 	}
+	if(m_pLightShader)
+	{
+		m_pLightShader->Shutdown();
+		delete m_pLightShader;
+		m_pLightShader = 0;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	// T5
+// 	if(m_TextureShader)
+// 	{
+// 		m_TextureShader->Shutdown();
+// 		delete m_TextureShader;
+// 		m_TextureShader = 0;
+// 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	// T4
@@ -160,9 +212,29 @@ void CGraphicsClass::Shutdown()
 bool CGraphicsClass::Frame()
 {
 	//////////////////////////////////////////////////////////////////////////
-	// T3
-	if(!Render())
+	// T6
+	static float rotation = 0.0f;
+
+	// Update the rotation variable each frame.
+	rotation += (float)D3DX_PI * 0.01f;
+	if(rotation > 360.0f)
+	{
+		rotation -= 360.0f;
+	}
+
+	// Render the graphics scene.
+	if(!Render(rotation))
+	{
+
 		return false;
+	}
+	//////////////////////////////////////////////////////////////////////////
+
+
+	//////////////////////////////////////////////////////////////////////////
+	// T3
+//	if(!Render())
+//		return false;
 	//////////////////////////////////////////////////////////////////////////
 	return true;
 }
@@ -181,8 +253,7 @@ bool CGraphicsClass::Render()
 	//////////////////////////////////////////////////////////////////////////
 	// T3
 	// Clear the buffers to begin the scene.
-		m_D3D->BeginScene(0x5, 0x6, 0x5, 1.0f);	
-	//m_D3D->BeginScene(0xff, 0xff, 0, 1.0f); // Yellow
+	m_D3D->BeginScene(backColorR, backColorG, backColorB, backColorA);	
 
 	//////////////////////////////////////////////////////////////////////////
 	// T4 Start
@@ -212,16 +283,52 @@ bool CGraphicsClass::Render()
 	//////////////////////////////////////////////////////////////////////////
 	// T5 Start
 	// Render the model using the texture shader.
-	if(!m_TextureShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), _worldMatrix, _viewMatrix, _projectionMatrix, m_Model->GetTexture()))
-	{
-		return false;
-	}
+// 	if(!m_TextureShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), _worldMatrix, _viewMatrix, _projectionMatrix, m_Model->GetTexture()))
+// 	{
+// 		return false;
+// 	}
 	//////////////////////////////////////////////////////////////////////////
 
 
 	// Present the rendered scene to the screen.
 	m_D3D->EndScene();
 	//////////////////////////////////////////////////////////////////////////
+	return true;
+}
+bool CGraphicsClass::Render(float _rotation)
+{
+	// Clear the buffers to begin the scene.
+	m_D3D->BeginScene(backColorR, backColorG, backColorB, backColorA);	
+
+	// Generate the view matrix based on the camera's position.
+	m_Camera->Render();
+
+	// Get the world, view, projection matrices from the camera and d3d objects.
+	D3DXMATRIX _viewMatrix;
+	m_Camera->GetViewMatrix(_viewMatrix);
+	D3DXMATRIX _worldMatrix;
+	m_D3D->GetWorldMatrix(_worldMatrix);
+	D3DXMATRIX _projectionMatrix;
+	m_D3D->GetProjectionMatrix(_projectionMatrix);
+
+	// 월드 행렬을 회전값만큼 회전시켜 이 행렬을 이용하여 삼각형을 그릴 떄 그 값만큼 회전되어 보이게 한다.
+	// Rotate the world matrix by the rotation value so that the triangle will spin.
+	D3DXMatrixRotationY(&_worldMatrix, _rotation);
+
+	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
+	m_Model->Render(m_D3D->GetDeviceContext());
+
+	// 조명 셰이더가 삼각형을 그리기 위해 호출 된다.
+	// 새 조명 객체는 Render 함수에 조명의 색상과 방향을 넘겨주어 셰이더가 그 값을 읽을 수 있게 한다.
+	// Render the model using the light shader.
+	if(!m_pLightShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), _worldMatrix, _viewMatrix, _projectionMatrix, m_Model->GetTexture(), m_pLight->GetDirection(), m_pLight->GetDiffuseColor()))
+	{
+		return false;
+	}
+
+	// Present the rendered scene to the screen.
+	m_D3D->EndScene();
+
 	return true;
 }
 
