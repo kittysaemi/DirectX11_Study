@@ -14,10 +14,10 @@
 // tutorial 4 
 #include "CameraClass.h"
 #include "ModelClass.h"
-//#include "ColorShaderClass.h" 
+#include "ColorShaderClass.h" 
 
 // tutorial 5
-//#include "Textureshaderclass.h"
+#include "Textureshaderclass.h"
 
 // tutorial 6
 #include "LightshaderClass.h"	
@@ -29,6 +29,7 @@ const bool FULL_SCREEN = true;//true;
 const bool VSYNC_ENABLED = false;//false;
 const float SCREEN_DEPTH = 1000.0f;
 const float SCREEN_NEAR = 0.1f;
+const int TUTORIALTYPE = 6;
 
 class CGraphicsClass
 {
@@ -46,7 +47,6 @@ public:
 
 private:
 	bool Render();
-	bool Render(float _rotation);	// T6
 
 	// tutorial 3 - T3
 	CD3DClass* m_D3D;
@@ -54,20 +54,18 @@ private:
 	// tutorial 4 - T4
 	CCameraClass* m_Camera;
 	CModelClass* m_Model;
-	//CColorShaderClass * m_ColorShader; 
+	CColorShaderClass * m_ColorShader; 
 
 	// T5
-	//CTextureshaderclass * m_TextureShader; 
+	CTextureshaderclass * m_TextureShader; 
 
 	// T6
 	CLightshaderClass* m_pLightShader;
 	CLightClass* m_pLight;
 
 	// saemi
-	float backColorR;
-	float backColorG;
-	float backColorB;
-	float backColorA;
+	float BGColor[4];
+	float LightColor[4];
 };
 
 

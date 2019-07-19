@@ -283,6 +283,9 @@ bool CLightshaderClass::SetShaderParameters(ID3D11DeviceContext* _devContext, D3
 	// Now set the constant buffer in the vertex shader with the updated values.
 	_devContext->VSSetConstantBuffers(bufNum, 1, &m_mBuffer);
 
+	// Set Shader texture resource in the pixel shader.
+	_devContext->PSSetShaderResources(0, 1, &_resourceView);
+
 	// Set shader texture resource in the pixel shader.
 	hResult = _devContext->Map(m_lBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &_mapResource);
 	if(FAILED(hResult))
