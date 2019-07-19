@@ -8,6 +8,9 @@ CModelClass::CModelClass(void)
 
 	// T5
 	m_pTexture = 0;
+
+	// T7
+	m_pModelType = 0;
 }
 CModelClass::CModelClass(const CModelClass& other)
 {
@@ -21,6 +24,7 @@ CModelClass::~CModelClass(void)
 
 bool CModelClass::Initialize(ID3D11Device* _device)
 {
+	
 	// 정점 버퍼와 인덱스 버퍼 초기화
 	if(!InitializeBuffers(_device))
 	{
@@ -31,7 +35,7 @@ bool CModelClass::Initialize(ID3D11Device* _device)
 	return true;
 }
 bool CModelClass::Initialize(ID3D11Device* _device, WCHAR* _filename)
-{
+{	
 	// Initialize the vertex and index buffer that hold the geometry for the triangle.
 	if(!InitializeBuffers(_device))
 	{
@@ -47,6 +51,23 @@ bool CModelClass::Initialize(ID3D11Device* _device, WCHAR* _filename)
 
 	 return true;
 }
+bool CModelClass::Initialize(ID3D11Device* _device, char* _modelfilename, WCHAR* _texurefilename)
+{
+	if(!LoadModel(_modelfilename))
+	{
+		return false;
+	}
+
+	if(!InitializeBuffers(_device))
+	{
+		return false;
+	}
+	
+	if(!LoadTexture(_device, _texurefilename))
+	{
+		return false;
+	}
+}
 
 void CModelClass::Shutdown()
 {
@@ -55,6 +76,8 @@ void CModelClass::Shutdown()
 
 	// 정점 버퍼와 인덱스 버퍼 해제
 	ShutdownBuffers();
+
+	ReleaseModel();
 	return;
 }
 
@@ -84,9 +107,9 @@ bool CModelClass::InitializeBuffers(ID3D11Device* _device)
 	/*
 		정점과 인덱스 데이터를 담아둘 두개의 임시 배열을 만들고 나중에 최종 버퍼를 생설할때 사용하도록 한다.
 	*/
-
+	/* Tutorial 4 ~ 6
 	bool Triangle = true;
-
+	 
 	if(Triangle)
 	{
 		// 정점 배열의 길이 설정
@@ -99,7 +122,7 @@ bool CModelClass::InitializeBuffers(ID3D11Device* _device)
 		m_nVertexCount = 6;
 		m_nIndexCount = 6;
 	}
-
+	*/
 	
 	// 정점 배열 생성
 	VertexType* _vertices = new VertexType[m_nVertexCount];
@@ -126,89 +149,89 @@ bool CModelClass::InitializeBuffers(ID3D11Device* _device)
 	*/
 	
 	// vertex array insert value
-	D3DXVECTOR3 LeftBottom = D3DXVECTOR3(-1.0f, -1.0f, 0.0f);
-	D3DXVECTOR3 LeftTop = D3DXVECTOR3(-1.0f, 1.0f, 0.0f);
-	D3DXVECTOR3 TopCenter = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-	D3DXVECTOR3 RightTop = D3DXVECTOR3(1.0f, 1.0f, 0.0f);
-	D3DXVECTOR3 RightBottom = D3DXVECTOR3(1.0f, -1.0f, 0.0f);
-	D3DXVECTOR3 Center = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-
-	if(m_nVertexCount == 3)
-	{
-		// 삼각형
-		_vertices[0].position = LeftBottom;
-		_vertices[1].position = TopCenter;
-		_vertices[2].position =  RightBottom ;
-	}
-	else if(m_nVertexCount == 6)
-	{
-		// 사각형
-		_vertices[0].position = LeftBottom;
-		_vertices[1].position = LeftTop;
-		_vertices[2].position = RightTop;
-		_vertices[3].position = LeftBottom;
-		_vertices[4].position = RightTop;
-		_vertices[5].position = RightBottom;
-	}
-
-
-
-	//T4
-// 	D3DXVECTOR4 greenColor = D3DXVECTOR4(0.0f, 1.0f, 0.0f, 1.0f);
-// 	D3DXVECTOR4 RedColor = D3DXVECTOR4(1.0f, 0.0f, 0.0f, 1.0f);
+//  Tutorial 4 - 6
+// 	D3DXVECTOR3 LeftBottom = D3DXVECTOR3(-1.0f, -1.0f, 0.0f);
+// 	D3DXVECTOR3 LeftTop = D3DXVECTOR3(-1.0f, 1.0f, 0.0f);
+// 	D3DXVECTOR3 TopCenter = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+// 	D3DXVECTOR3 RightTop = D3DXVECTOR3(1.0f, 1.0f, 0.0f);
+// 	D3DXVECTOR3 RightBottom = D3DXVECTOR3(1.0f, -1.0f, 0.0f);
+// 	D3DXVECTOR3 Center = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 // 
-// 	// 색상 밝기
-// 	float Bright = 0.5f;
+// 	if(m_nVertexCount == 3)
+// 	{
+// 		// 삼각형
+// 		_vertices[0].position = LeftBottom;
+// 		_vertices[1].position = TopCenter;
+// 		_vertices[2].position =  RightBottom ;
+// 	}
+// 	else if(m_nVertexCount == 6)
+// 	{
+// 		// 사각형
+// 		_vertices[0].position = LeftBottom;
+// 		_vertices[1].position = LeftTop;
+// 		_vertices[2].position = RightTop;
+// 		_vertices[3].position = LeftBottom;
+// 		_vertices[4].position = RightTop;
+// 		_vertices[5].position = RightBottom;
+// 	}
 // 
+// 
+// 
+// 	//T4
+// // 	D3DXVECTOR4 greenColor = D3DXVECTOR4(0.0f, 1.0f, 0.0f, 1.0f);
+// // 	D3DXVECTOR4 RedColor = D3DXVECTOR4(1.0f, 0.0f, 0.0f, 1.0f);
+// // 
+// // 	// 색상 밝기
+// // 	float Bright = 0.5f;
+// // 
+// // 
+// // 	for(int i=0; i<m_nIndexCount; i++)
+// // 	{
+// // 		_vertices[i].color = greenColor * Bright;
+// // 	}
+// 		
+// 	// T5
+// 	D3DXVECTOR2 leftTopUV = D3DXVECTOR2(0.0f, 0.0f);
+// 	D3DXVECTOR2 TopCenterUV = D3DXVECTOR2(0.5f, 0.0f);
+// 	D3DXVECTOR2 rightTopUV = D3DXVECTOR2(1.0f, 0.0f);
+// 	D3DXVECTOR2 leftCenterUV = D3DXVECTOR2(0.0f, 0.5f);
+// 	D3DXVECTOR2 CenterUV = D3DXVECTOR2(0.5f, 0.5f);
+// 	D3DXVECTOR2 rightCenterUV = D3DXVECTOR2(1.0f, 0.5f);
+// 	D3DXVECTOR2 leftBottomUV = D3DXVECTOR2(0.0f, 1.0f);
+// 	D3DXVECTOR2 CenterBottomUV = D3DXVECTOR2(0.5f, 1.0f);
+// 	D3DXVECTOR2 rightBottomUV = D3DXVECTOR2(1.0f, 1.0f);
+// 
+// 	if(m_nVertexCount == 3)
+// 	{
+// 		_vertices[0].texture =  D3DXVECTOR2(0.0f, 1.0f);
+// 		_vertices[1].texture = D3DXVECTOR2(0.5f, 0.0f);
+// 		_vertices[2].texture =D3DXVECTOR2(1.0f, 1.0f);
+// 	}
+// 	else
+// 	{
+// 		_vertices[0].texture = leftBottomUV;
+// 		_vertices[1].texture = leftTopUV;
+// 		_vertices[2].texture = rightTopUV;
+// 		_vertices[3].texture = leftBottomUV;
+// 		_vertices[4].texture = rightTopUV;
+// 		_vertices[5].texture = rightBottomUV;
+// 	}
+// 
+// 	//////////////////////////////////////////////////////////////////////////
 // 
 // 	for(int i=0; i<m_nIndexCount; i++)
 // 	{
-// 		_vertices[i].color = greenColor * Bright;
+// 		// T6
+// 		/*
+// 			각 정점은 빛의 계산을 위하여 연관된 법선을 가지게 된다.
+// 			법선은 도형의 표면에 수직하는 선이기 떄문에 표면이 바라보고 있는 방향을 정확히 계산할 수 있따.
+// 			코드의 간단함을 유지하기 위해 법선이 시청자에게로 향하도록 각 정점의 법선의 Z성분을 -1.0f로 하였다
+// 		*/
+// 		_vertices[i].normal = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+// 		// T6 End
+// 				
+// 		_indices[i] = i;
 // 	}
-		
-	// T5
-	D3DXVECTOR2 leftTopUV = D3DXVECTOR2(0.0f, 0.0f);
-	D3DXVECTOR2 TopCenterUV = D3DXVECTOR2(0.5f, 0.0f);
-	D3DXVECTOR2 rightTopUV = D3DXVECTOR2(1.0f, 0.0f);
-	D3DXVECTOR2 leftCenterUV = D3DXVECTOR2(0.0f, 0.5f);
-	D3DXVECTOR2 CenterUV = D3DXVECTOR2(0.5f, 0.5f);
-	D3DXVECTOR2 rightCenterUV = D3DXVECTOR2(1.0f, 0.5f);
-	D3DXVECTOR2 leftBottomUV = D3DXVECTOR2(0.0f, 1.0f);
-	D3DXVECTOR2 CenterBottomUV = D3DXVECTOR2(0.5f, 1.0f);
-	D3DXVECTOR2 rightBottomUV = D3DXVECTOR2(1.0f, 1.0f);
-
-	if(m_nVertexCount == 3)
-	{
-		_vertices[0].texture =  D3DXVECTOR2(0.0f, 1.0f);
-		_vertices[1].texture = D3DXVECTOR2(0.5f, 0.0f);
-		_vertices[2].texture =D3DXVECTOR2(1.0f, 1.0f);
-	}
-	else
-	{
-		_vertices[0].texture = leftBottomUV;
-		_vertices[1].texture = leftTopUV;
-		_vertices[2].texture = rightTopUV;
-		_vertices[3].texture = leftBottomUV;
-		_vertices[4].texture = rightTopUV;
-		_vertices[5].texture = rightBottomUV;
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-
-	for(int i=0; i<m_nIndexCount; i++)
-	{
-		// T6
-		/*
-			각 정점은 빛의 계산을 위하여 연관된 법선을 가지게 된다.
-			법선은 도형의 표면에 수직하는 선이기 떄문에 표면이 바라보고 있는 방향을 정확히 계산할 수 있따.
-			코드의 간단함을 유지하기 위해 법선이 시청자에게로 향하도록 각 정점의 법선의 Z성분을 -1.0f로 하였다
-		*/
-		_vertices[i].normal = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
-		// T6 End
-				
-		_indices[i] = i;
-	}
-
 
 
 	/*
@@ -217,6 +240,21 @@ bool CModelClass::InitializeBuffers(ID3D11Device* _device)
 		정점 배열과 인덱스 배열을 subresource포인터에 연결한다.
 		descrition과 subresource 포인터, 그리고 d3d 디바이스의 createbuffer 함수를 사용하여 새 버퍼의 포인터 받아 온다.
 	*/
+
+
+	// Load the vertex array and index array with data.
+
+	for(int i=0; i<m_nVertexCount; i++)
+	{
+		_vertices[i].position = D3DXVECTOR3(m_pModelType[i].location[0], m_pModelType[i].location[1], m_pModelType[i].location[2]);
+		_vertices[i].texture = D3DXVECTOR2(m_pModelType[i].texture[0], m_pModelType[i].texture[1]);
+		_vertices[i].normal = D3DXVECTOR3(m_pModelType[i].normalvetor[0], m_pModelType[i].normalvetor[1], m_pModelType[i].normalvetor[2]);
+
+		_indices[i] = i;
+	}
+
+
+
 
 	// Set up the description of the vertex buffer.
 	D3D11_BUFFER_DESC _vertexBufferDesc;
@@ -343,5 +381,65 @@ void CModelClass::ReleaseTexture()
 		delete m_pTexture;
 		m_pTexture = 0;
 	}
+	return;
+}
+
+bool CModelClass::LoadModel(char* _fileName)
+{
+	// open the model file
+	ifstream fileIn;
+	fileIn.open(_fileName);
+
+	if(fileIn.fail())
+	{
+		return false;
+	}
+
+	char input;
+	fileIn.get(input);
+	while(input != ':')
+	{
+		fileIn.get(input);
+	}
+
+	fileIn >> m_nVertexCount;
+
+	m_nIndexCount = m_nVertexCount;
+
+	m_pModelType = new ModelType[m_nVertexCount];
+	if(!m_pModelType)
+	{
+		return false;
+	}
+
+	fileIn.get(input);
+	while(input != ':')
+	{
+		fileIn.get(input);
+	}
+
+	fileIn.get(input);
+	fileIn.get(input);
+
+	for(int i=0; i<m_nVertexCount; i++)
+	{
+		fileIn >> m_pModelType[i].location[0] >> m_pModelType[i].location[1] >> m_pModelType[i].location[2];
+		fileIn >> m_pModelType[i].texture[0] >> m_pModelType[i].texture[1];
+		fileIn >> m_pModelType[i].normalvetor[0] >> m_pModelType[i].normalvetor[1] >> m_pModelType[i].normalvetor[2];
+	}
+
+	fileIn.close();
+
+	return true;
+}
+
+void CModelClass::ReleaseModel()
+{
+	if(m_pModelType)
+	{
+		delete [] m_pModelType;
+		m_pModelType = 0;
+	}
+
 	return;
 }

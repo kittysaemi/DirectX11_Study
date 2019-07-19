@@ -16,6 +16,9 @@
     <Filter Include="HLSL">
       <UniqueIdentifier>{d99e27e9-e410-4bbb-811d-a13b18363aa1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ModelFormat">
+      <UniqueIdentifier>{e3c652ca-c1a9-4835-94f3-36bddaaa518e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GraphicsClass.cpp">
@@ -109,6 +112,9 @@
     </None>
     <None Include="Light.vs">
       <Filter>HLSL</Filter>
+    </None>
+    <None Include="Cube.txt">
+      <Filter>ModelFormat</Filter>
     </None>
   </ItemGroup>
 </Project>

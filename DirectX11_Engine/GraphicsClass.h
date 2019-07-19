@@ -29,7 +29,7 @@ const bool FULL_SCREEN = true;//true;
 const bool VSYNC_ENABLED = false;//false;
 const float SCREEN_DEPTH = 1000.0f;
 const float SCREEN_NEAR = 0.1f;
-const int TUTORIALTYPE = 6;
+const int TUTORIALTYPE = 7;
 
 class CGraphicsClass
 {

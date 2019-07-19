@@ -106,6 +106,7 @@
   <ItemGroup>
     <None Include="Color.ps" />
     <None Include="Color.vs" />
+    <None Include="Cube.txt" />
     <None Include="Light.ps" />
     <None Include="Light.vs" />
     <None Include="Texture.ps" />

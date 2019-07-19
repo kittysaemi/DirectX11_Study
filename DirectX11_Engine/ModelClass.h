@@ -11,6 +11,9 @@
 
 	Tutorial 6
 	조명
+
+	Tutorial 7
+	3D 모델
 */
 
 
@@ -20,6 +23,10 @@
 
 #include <d3d11.h>
 #include <D3DX10math.h>
+
+// T7
+#include <fstream>
+using namespace std;
 
 // T5
 #include "TextureClass.h"
@@ -52,6 +59,13 @@ private:
 		D3DXVECTOR3 normal;
 	};
 
+	// T7
+	struct ModelType
+	{
+		float location[3];		// 위치
+		float texture[2];		// 텍스쳐
+		float normalvetor[3];	// 법선 벡터
+	};
 
 public:
 	CModelClass(void);
@@ -59,7 +73,8 @@ public:
 	~CModelClass(void);
 
 	bool Initialize(ID3D11Device* _device);
-	bool Initialize(ID3D11Device* _device, WCHAR* _filename);	// T5 추가
+	bool Initialize(ID3D11Device* _device, WCHAR* _filename);	// T5 ~
+	bool Initialize(ID3D11Device* _device, char* _modelfilename, WCHAR* _texurefilename);	// T7
 	void Shutdown();
 	void Render(ID3D11DeviceContext* _devContext);
 
@@ -78,6 +93,10 @@ private:
 	bool LoadTexture(ID3D11Device* _device, WCHAR* _filename);
 	void ReleaseTexture();
 
+	// T7
+	bool LoadModel(char* _fileName);
+	void ReleaseModel();
+
 private:
 	ID3D11Buffer *m_pVertexBuffer;
 	ID3D11Buffer *m_pIndexBuffer;
@@ -86,6 +105,9 @@ private:
 
 	// T5
 	CTextureClass* m_pTexture;
+
+	// T7
+	ModelType * m_pModelType;
 };
 
 #endif

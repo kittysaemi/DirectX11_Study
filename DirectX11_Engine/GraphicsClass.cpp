@@ -23,11 +23,11 @@ CGraphicsClass::CGraphicsClass(void)
 	BGColor[1] = 0.0f;	// 0xff		// 0x6
 	BGColor[2] = 0.0f;	// 0x00		// 0x5
 	BGColor[3] = 1.0f;	
-					//³ì»ö	// ÀÚÁÖ»ö
-	LightColor[0] =	0.3f;	// 1.0f;
-	LightColor[1] =	1.0f;	// 0.0f;
-	LightColor[2] =	0.3f;	// 1.0f;
-	LightColor[3] =	1.0f;	// 1.0f;
+					//Èò»ö	//³ì»ö	// ÀÚÁÖ»ö
+	LightColor[0] =	1.0f;	// 0.3f;	// 1.0f;
+	LightColor[1] =	1.0f;		//	1.0f;	// 0.0f;
+	LightColor[2] =	1.0f;		//0.3f;	// 1.0f;
+	LightColor[3] =	1.0f;		//1.0f;	// 1.0f;
 
 }
 
@@ -94,42 +94,54 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 		{
 			return false;
 		}
+		// create the color shader object.
+		m_ColorShader = new CColorShaderClass;
+		if(!m_ColorShader)
+		{
+			OutputDebugStringA("Could not Create ColorShaderclass");
+			return false;
+		}
+
+		// Initialize the color shader object.
+		if(!m_ColorShader->Initialize(m_D3D->GetDevice(), hWnd))
+		{
+			OutputDebugStringA("Could not initialize the color shader object.");
+			return false;
+		}
+
+		return true;
 	}
-	if(TUTORIALTYPE >= 5)
+	if(TUTORIALTYPE >= 5 && TUTORIALTYPE <= 6)
 	{	
 		if(!m_Model->Initialize(m_D3D->GetDevice(), L"../DirectX11_Engine/data/seafloor.dds"))	
 		{
 			OutputDebugStringA("Could not initialize the model object.");
 			return false;
+		}		
+	}
+	if(TUTORIALTYPE == 7)
+	{
+		if(!m_Model->Initialize(m_D3D->GetDevice(), "../DirectX11_Engine/Cube.txt", L"../DirectX11_Engine/data/seafloor.dds" ))
+		{
+			return false;
 		}
 	}
-	// create the color shader object.
-	m_ColorShader = new CColorShaderClass;
-	if(!m_ColorShader)
-	{
-		OutputDebugStringA("Could not Create ColorShaderclass");
-		return false;
-	}
 
-	// Initialize the color shader object.
-	if(!m_ColorShader->Initialize(m_D3D->GetDevice(), hWnd))
+	if(TUTORIALTYPE == 5)
 	{
-		OutputDebugStringA("Could not initialize the color shader object.");
-		return false;
-	}
-	
-	// T5
-	// create the texture shader object.
-	m_TextureShader = new CTextureshaderclass;
-	if(!m_TextureShader)
-	{
-		return false;
-	}
+		// create the texture shader object.
+		m_TextureShader = new CTextureshaderclass;
+		if(!m_TextureShader)
+		{
+			return false;
+		}
 
-	// Initalize the texture shader object.
-	if(!m_TextureShader->Initialize(m_D3D->GetDevice(), hWnd))
-	{
-		return false;
+		// Initalize the texture shader object.
+		if(!m_TextureShader->Initialize(m_D3D->GetDevice(), hWnd))
+		{
+			return false;
+		}
+		return true;
 	}
 
 	// T6
@@ -262,7 +274,7 @@ bool CGraphicsClass::Render()
 	m_D3D->GetProjectionMatrix(_projectionMatrix);
 
 
-	if(TUTORIALTYPE == 6)
+	if(TUTORIALTYPE >= 6)
 	{
 		// Update the rotation variable each frame.
 		static float rotation = 0.0f;
@@ -303,7 +315,7 @@ bool CGraphicsClass::Render()
 		}
 	}
 
-	if(TUTORIALTYPE == 6)
+	if(TUTORIALTYPE >= 6)
 	{
 		if(!m_pLightShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), _worldMatrix, _viewMatrix, _projectionMatrix, m_Model->GetTexture(), m_pLight->GetDirection(), m_pLight->GetDiffuseColor()))
 		{
