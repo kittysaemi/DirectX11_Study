@@ -21,25 +21,30 @@ typedef struct
 	int nIndex[3];
 }FaceType;
 
-void GetModelFilename(char* _fileName);
+bool GetModelFilename(char* _fileName);
 bool ReadFileCounts(char * _fileName, int&, int&, int&, int&);
 bool LoadDataStructures(char * _fileName, char * _saveFileName, int, int, int, int);
 
 
 int main(int argc, char* argv[])
 {
-	// Read in the name of the model file.
+	// Read in the name of the modnel file.
 	char filenmae[256];
-	GetModelFilename(filenmae);
+
+	if(!GetModelFilename(filenmae))
+		return -1;
 
 	// Read in the number of vertices, tex coords, normals, and faces so that the data structures can be initialized with the exact sizes needed.
 	int _nVCount = 0, _nTCount = 0, _nNCount = 0, _nFCount = 0;
 	if(!ReadFileCounts(filenmae, _nVCount, _nTCount, _nNCount, _nFCount))
-	{
+	{	
 		cout << "Read FIle Counts Faild" << endl;
 
 		return -1;
 	}
+
+
+
 
 	// Display the counts to the screen for information purposes.
 	cout << endl;
@@ -49,6 +54,7 @@ int main(int argc, char* argv[])
 	cout << "Faces :" << _nFCount << endl;
 
 	char saveFileName[256];
+	cout << endl;
 	cout << "Save Model FileName : ";
 	cin >> saveFileName;
 
@@ -68,7 +74,7 @@ int main(int argc, char* argv[])
 	return 0;
 }
 
-void GetModelFilename(char* _fileName)
+bool GetModelFilename(char* _fileName)
 {
 	bool done = false;
 
@@ -77,6 +83,18 @@ void GetModelFilename(char* _fileName)
 		cout << "Enter model filename : " ;
 
 		cin >> _fileName;
+
+		char TempFileName[256];
+		strcpy(TempFileName, _fileName);
+
+		strupr(TempFileName);
+
+		if(strcmp(TempFileName, "EXIT") == 0)
+		{
+			done = false;
+			break;
+		}
+
 
 		ifstream _fileIn;
 		_fileIn.open(_fileName);
@@ -93,7 +111,7 @@ void GetModelFilename(char* _fileName)
 		}
 	}
 
-	return;
+	return done;
 }
 
 bool ReadFileCounts(char * _fileName, int& _verC, int& _texC, int& _norC, int& _facC)
@@ -184,26 +202,27 @@ bool LoadDataStructures(char * _fileName, char * _saveFileName, int vC, int tC, 
 
 				cout << "vertices " << vIdex << endl; AllIdx++;
 			}
+			if(input == 't')
+			{
+				fileIn >> texcoords[tIndex].x >> texcoords[tIndex].y;
+
+				texcoords[tIndex].y = 1.0f - texcoords[tIndex].y;
+				tIndex++;
+
+				cout << "texcoords " << tIndex << endl; AllIdx++;
+			}
+
+			if(input == 'n')
+			{
+				fileIn >> normals[nIndex].x >> normals[nIndex].y >> normals[nIndex].z;
+
+				normals[nIndex].z = normals[nIndex].z * -1.0f;
+				nIndex++;
+
+				cout << "normals " << nIndex << endl; AllIdx++;
+			}
 		}
-		if(input == 't')
-		{
-			fileIn >> texcoords[tIndex].x >> texcoords[tIndex].y;
 
-			texcoords[tIndex].y = 1.0f - texcoords[tIndex].y;
-			tIndex++;
-
-			cout << "texcoords " << tIndex << endl; AllIdx++;
-		}
-
-		if(input == 'n')
-		{
-			fileIn >> normals[nIndex].x >> normals[nIndex].y >> normals[nIndex].z;
-
-			normals[nIndex].z = normals[nIndex].z * -1.0f;
-			nIndex++;
-
-			cout << "normals " << nIndex << endl; AllIdx++;
-		}
 		if(input == 'f')
 		{
 			char Temp;
@@ -211,9 +230,10 @@ bool LoadDataStructures(char * _fileName, char * _saveFileName, int vC, int tC, 
 			fileIn.get(input);
 			if(input == ' ')
 			{
-				fileIn >> faces[fIndex].vIndex[2] >> Temp >> faces[fIndex].tIndex[2] >> Temp >> faces[fIndex].nIndex[2]
-				>> faces[fIndex].vIndex[1] >> Temp >> faces[fIndex].tIndex[1] >> Temp >> faces[fIndex].nIndex[1]
-				>> faces[fIndex].vIndex[0] >> Temp >> faces[fIndex].tIndex[0] >> Temp >> faces[fIndex].nIndex[0];
+					fileIn >> faces[fIndex].vIndex[2] >> Temp >> faces[fIndex].tIndex[2] >> Temp >> faces[fIndex].nIndex[2]
+					>> faces[fIndex].vIndex[1] >> Temp >> faces[fIndex].tIndex[1] >> Temp >> faces[fIndex].nIndex[1]
+					>> faces[fIndex].vIndex[0] >> Temp >> faces[fIndex].tIndex[0] >> Temp >> faces[fIndex].nIndex[0];
+				
 				fIndex++;
 
 				cout << "faces " << fIndex << endl; AllIdx++;

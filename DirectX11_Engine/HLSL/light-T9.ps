@@ -1,0 +1,73 @@
+////////////////////////////////////////////////////////////////////////////////
+// Filename: light.ps
+////////////////////////////////////////////////////////////////////////////////
+
+
+/////////////
+// GLOBALS //
+/////////////
+Texture2D shaderTexture;
+SamplerState SampleType;
+
+cbuffer LightBuffer
+{
+	float4 ambientColor;
+    float4 diffuseColor;
+    float3 lightDirection;
+	float padding;
+};
+
+
+//////////////
+// TYPEDEFS //
+//////////////
+struct PixelInputType
+{
+    float4 position : SV_POSITION;
+    float2 tex : TEXCOORD0;
+	float3 normal : NORMAL;
+};
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Pixel Shader
+////////////////////////////////////////////////////////////////////////////////
+float4 LightPixelShader(PixelInputType input) : SV_TARGET
+{
+	float4 textureColor;
+	float3 lightDir;
+	float lightIntensity;
+	float4 color;
+
+
+	// Sample the pixel color from the texture using the sampler at this texture coordinate location.
+	textureColor = shaderTexture.Sample(SampleType, input.tex);
+
+	// 결과의 색상값을 기본으로 주변광 값으로 맞춘다. 
+	// 모든 픽셀들은 최소한 주변광 값을 가지게 된다.
+	// Set the default output color to the ambient light value for all pixels.
+	color = ambientColor;
+
+	// Invert the light direction for calculations.
+	lightDir = -lightDirection;
+
+	// Calculate the amount of light on this pixel.
+	lightIntensity = saturate(dot(input.normal, lightDir));
+
+	// 법선과 빛의 방향의 내적이 0보다 큰지 확인 후, true 조명값을 주변광에 더함. false 조명값을 더 하지 않도록 한다.
+	// 간혹 음수로 계싼되는 빛의 밝기값이 주변광 값을 깍아먹는 경우가 생기는 것을 방지.
+	if(lightIntensity > 0.0f)
+	{
+		// Determine the final diffuse color based on the diffuse color and the amount of light intensity.
+		color += (diffuseColor * lightIntensity);
+	}
+
+	// 주변광의 조명의 조합의 결과가 1이 넘을 수 있으므로 saturate 함수로 최종 색상이 적절한 값이 되도록 잘라낸다.
+	// Saturate the final light color.
+	color = saturate(color);
+
+	// Multiply the texture pixel and the final diffuse color to get the final pixel color result.
+	color = color * textureColor;
+	
+    return color;
+}

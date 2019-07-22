@@ -29,7 +29,7 @@ const bool FULL_SCREEN = true;//true;
 const bool VSYNC_ENABLED = false;//false;
 const float SCREEN_DEPTH = 1000.0f;
 const float SCREEN_NEAR = 0.1f;
-const int TUTORIALTYPE = 7;
+const int TUTORIALTYPE = 9;
 
 class CGraphicsClass
 {
@@ -66,6 +66,7 @@ private:
 	// saemi
 	float BGColor[4];
 	float LightColor[4];
+	float AmbientColor[4];
 };
 
 

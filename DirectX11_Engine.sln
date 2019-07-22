@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectX11_Engine", "DirectX11_Engine\DirectX11_Engine.vcxproj", "{DA05474B-41F2-482D-BD09-9DA2C79AE43E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "3D_Obj_PassorEx", "3D_Obj_PassorEx\3D_Obj_PassorEx.vcxproj", "{EB91033A-B685-4CC2-8ECA-844ED8E84F77}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -13,6 +15,10 @@ Global
 		{DA05474B-41F2-482D-BD09-9DA2C79AE43E}.Debug|Win32.Build.0 = Debug|Win32
 		{DA05474B-41F2-482D-BD09-9DA2C79AE43E}.Release|Win32.ActiveCfg = Release|Win32
 		{DA05474B-41F2-482D-BD09-9DA2C79AE43E}.Release|Win32.Build.0 = Release|Win32
+		{EB91033A-B685-4CC2-8ECA-844ED8E84F77}.Debug|Win32.ActiveCfg = Debug|Win32
+		{EB91033A-B685-4CC2-8ECA-844ED8E84F77}.Debug|Win32.Build.0 = Debug|Win32
+		{EB91033A-B685-4CC2-8ECA-844ED8E84F77}.Release|Win32.ActiveCfg = Release|Win32
+		{EB91033A-B685-4CC2-8ECA-844ED8E84F77}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

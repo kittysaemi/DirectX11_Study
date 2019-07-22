@@ -107,6 +107,7 @@
     <None Include="Color.ps" />
     <None Include="Color.vs" />
     <None Include="Cube.txt" />
+    <None Include="light-T9.ps" />
     <None Include="Light.ps" />
     <None Include="Light.vs" />
     <None Include="Texture.ps" />

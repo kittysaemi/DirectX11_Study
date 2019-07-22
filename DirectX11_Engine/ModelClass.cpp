@@ -67,6 +67,8 @@ bool CModelClass::Initialize(ID3D11Device* _device, char* _modelfilename, WCHAR*
 	{
 		return false;
 	}
+
+	return true;
 }
 
 void CModelClass::Shutdown()

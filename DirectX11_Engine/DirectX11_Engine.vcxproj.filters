@@ -116,5 +116,8 @@
     <None Include="Cube.txt">
       <Filter>ModelFormat</Filter>
     </None>
+    <None Include="light-T9.ps">
+      <Filter>HLSL</Filter>
+    </None>
   </ItemGroup>
 </Project>

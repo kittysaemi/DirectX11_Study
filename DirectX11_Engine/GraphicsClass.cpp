@@ -29,6 +29,12 @@ CGraphicsClass::CGraphicsClass(void)
 	LightColor[2] =	1.0f;		//0.3f;	// 1.0f;
 	LightColor[3] =	1.0f;		//1.0f;	// 1.0f;
 
+	// 주변광					//15%
+	AmbientColor[0] = 0.2f;		//0.15f;
+	AmbientColor[1] = 0.2f;		//0.15f;
+	AmbientColor[2] = 0.2f;		//0.15f;
+	AmbientColor[3] = 1.0f;
+
 }
 
 CGraphicsClass::CGraphicsClass(const CGraphicsClass& other)
@@ -119,9 +125,10 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 			return false;
 		}		
 	}
-	if(TUTORIALTYPE == 7)
+	if(TUTORIALTYPE >= 7)
 	{
-		if(!m_Model->Initialize(m_D3D->GetDevice(), "../DirectX11_Engine/Cube.txt", L"../DirectX11_Engine/data/seafloor.dds" ))
+		if(!m_Model->Initialize(m_D3D->GetDevice(), "../DirectX11_Engine/data/Cube.txt", L"../DirectX11_Engine/data/wood.dds" ))
+		//if(!m_Model->Initialize(m_D3D->GetDevice(), "../DirectX11_Engine/data/Moon.txt", L"../DirectX11_Engine/data/wood.dds" ))
 		{
 			return false;
 		}
@@ -153,7 +160,7 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 	}
 
 	// Initialize the light shader object.
-	if(!m_pLightShader->Initialize(m_D3D->GetDevice(), hWnd))
+	if(!m_pLightShader->Initialize(m_D3D->GetDevice(), hWnd, TUTORIALTYPE))
 	{
 		return false;
 	}
@@ -166,6 +173,11 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 	}
 
 	// 조명의 색상을 자주색으로 하고 그 방향을 z축의 양의 값으로 합니다.
+
+
+	// T9 - 주변광 추가
+	m_pLight->SetAmbientColor(AmbientColor[0], AmbientColor[1], AmbientColor[2], AmbientColor[3]);
+
 	// Initialize the light object.
 	m_pLight->SetDiffuseColor(LightColor[0], LightColor[1], LightColor[2], LightColor[3]);
 	m_pLight->SetDirection(0.0f, 0.0f, 1.0f);
@@ -279,7 +291,8 @@ bool CGraphicsClass::Render()
 		// Update the rotation variable each frame.
 		static float rotation = 0.0f;
 
-		rotation += (float)D3DX_PI * 0.01f;
+		rotation += (float)D3DX_PI * 0.001f;	// 속도 반으로 줄이기
+		//rotation += (float)D3DX_PI * 0.01f;
 		if(rotation > 360.0f)
 		{
 			rotation -= 360.0f;
@@ -315,9 +328,17 @@ bool CGraphicsClass::Render()
 		}
 	}
 
-	if(TUTORIALTYPE >= 6)
+	if(TUTORIALTYPE >= 6 && TUTORIALTYPE <= 8)
 	{
 		if(!m_pLightShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), _worldMatrix, _viewMatrix, _projectionMatrix, m_Model->GetTexture(), m_pLight->GetDirection(), m_pLight->GetDiffuseColor()))
+		{
+			return false;
+		}
+	}
+
+	if(TUTORIALTYPE >= 9)
+	{
+		if(!m_pLightShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), _worldMatrix, _viewMatrix, _projectionMatrix, m_Model->GetTexture(), m_pLight->GetDirection(), m_pLight->GetDiffuseColor(), m_pLight->GetAmbientColor() ))
 		{
 			return false;
 		}

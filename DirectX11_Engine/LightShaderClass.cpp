@@ -22,12 +22,22 @@ CLightshaderClass::~CLightshaderClass()
 
 }
 
-bool CLightshaderClass::Initialize(ID3D11Device* _device, HWND hWnd)
+bool CLightshaderClass::Initialize(ID3D11Device* _device, HWND hWnd, int _TutorialNum)
 {
-	if(!InitializeShader(_device, hWnd, L"../DirectX11_Engine/Light.vs", L"../DirectX11_Engine/Light.ps"))
+	TutorialNum = _TutorialNum;
+
+	if(_TutorialNum <= 8)
 	{
-		return false;
+		if(!InitializeShader(_device, hWnd, L"../DirectX11_Engine/Light.vs", L"../DirectX11_Engine/Light.ps"))
+			return false;
 	}
+	else if(_TutorialNum >=9)
+	{
+		if(!InitializeShader(_device, hWnd, L"../DirectX11_Engine/Light.vs", L"../DirectX11_Engine/Light-T9.ps"))
+		{
+			return false;
+		}
+	}	
 
 	return true;
 }
@@ -41,6 +51,18 @@ void CLightshaderClass::Shutdown()
 bool CLightshaderClass::Render(ID3D11DeviceContext* _devContext, int idxCount, D3DXMATRIX mWorld, D3DXMATRIX mView, D3DXMATRIX mProjection, ID3D11ShaderResourceView *_resourceView, D3DXVECTOR3 _lightDesc, D3DXVECTOR4 _DiffuseColor)
 {
 	if(!SetShaderParameters(_devContext, mWorld, mView, mProjection, _resourceView, _lightDesc, _DiffuseColor))
+	{
+		return false;
+	}
+
+	RenderShader(_devContext, idxCount);
+
+	return true;
+}
+
+bool CLightshaderClass::Render(ID3D11DeviceContext* _devContext, int idxCount, D3DXMATRIX mWorld, D3DXMATRIX mView, D3DXMATRIX mProjection, ID3D11ShaderResourceView *_resourceView, D3DXVECTOR3 _lightDesc, D3DXVECTOR4 _DiffuseColor, D3DXVECTOR4 _ambientColor)
+{
+	if(!SetShaderParameters(_devContext, mWorld, mView, mProjection, _resourceView, _lightDesc, _DiffuseColor, _ambientColor))
 	{
 		return false;
 	}
@@ -173,7 +195,7 @@ bool CLightshaderClass::InitializeShader(ID3D11Device* _device, HWND _hWnd, WCHA
 	// Note that ByteWidth always needs to be a multiple of 16 if using D3D11_BIND_CONSTANT_BUFFER or CreateBuffer will fail.
 	D3D11_BUFFER_DESC lightBuf;
 	lightBuf.Usage = D3D11_USAGE_DYNAMIC;
-	lightBuf.ByteWidth = sizeof(LightBufferType);
+	lightBuf.ByteWidth = (TutorialNum < 9)?sizeof(LightBufferType):sizeof(LightBufferType_9);
 	lightBuf.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	lightBuf.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	lightBuf.MiscFlags = 0;
@@ -310,6 +332,67 @@ bool CLightshaderClass::SetShaderParameters(ID3D11DeviceContext* _devContext, D3
 
 	return true;
 	
+
+}
+
+bool CLightshaderClass::SetShaderParameters(ID3D11DeviceContext* _devContext, D3DXMATRIX mWorld, D3DXMATRIX mView, D3DXMATRIX mProjection, ID3D11ShaderResourceView *_resourceView, D3DXVECTOR3 _lightDesc, D3DXVECTOR4 _DiffuseColor, D3DXVECTOR4 _ambientColor )
+{
+	// Transpose the matrices to prepare them for the shader.
+	D3DXMatrixTranspose(&mWorld, &mWorld);
+	D3DXMatrixTranspose(&mView, &mView);
+	D3DXMatrixTranspose(&mProjection, &mProjection);
+
+	// Lock the constant buffer so it can be written to.
+	D3D11_MAPPED_SUBRESOURCE _mapResource;
+	HRESULT hResult = _devContext->Map(m_mBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &_mapResource);
+	if(FAILED(hResult))
+		return false;
+
+	// Get a pointer to the data in the constant buffer.
+	MatrixBufferType* ptrMatrix = (MatrixBufferType*)_mapResource.pData;
+
+	// Copy the matrices into the constant buffer.
+	ptrMatrix->world = mWorld;
+	ptrMatrix->view = mView;
+	ptrMatrix->projection = mProjection;
+
+	// UnLock the constant buffer.
+	_devContext->Unmap(m_mBuffer, 0);
+
+	// Set the position of the constant buffer in the vertex shader.
+	unsigned int bufNum = 0;
+
+	// Now set the constant buffer in the vertex shader with the updated values.
+	_devContext->VSSetConstantBuffers(bufNum, 1, &m_mBuffer);
+
+	// Set Shader texture resource in the pixel shader.
+	_devContext->PSSetShaderResources(0, 1, &_resourceView);
+
+	// Set shader texture resource in the pixel shader.
+	hResult = _devContext->Map(m_lBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &_mapResource);
+	if(FAILED(hResult))
+		return false;
+
+	// Get a pointer to the data in the constant buffer.
+	LightBufferType_9* ptrLight = (LightBufferType_9*)_mapResource.pData;
+
+	// Copy the lighting variables into the constant buffer.
+	ptrLight->ambientColor = _ambientColor;
+	ptrLight->diffuseColor = _DiffuseColor;
+	ptrLight->lightDirection = _lightDesc;
+	ptrLight->_padding = 0.0f;
+
+	// Unlock the constant buffer.
+	_devContext->Unmap(m_lBuffer, 0);
+
+	// Set the position of the light constant buffer in the pixel shader.
+	bufNum = 0;
+
+	// Finally set the light constant buffer in the pixel shader with the updated values.
+	_devContext->PSSetConstantBuffers(bufNum, 1, &m_lBuffer);
+
+	return true;
+
 
 }
 
