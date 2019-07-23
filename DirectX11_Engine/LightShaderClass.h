@@ -4,7 +4,10 @@
 // TextureShaderClass 의 Upgrade Version
 
 // Tutorial 9
-// 주변광 추가
+// 주변광
+
+// Tutorial 10
+// 반사광
 
 
 #pragma once
@@ -28,8 +31,12 @@ private:
 		D3DXMATRIX projection;
 	};
 
-	// 구조체의 크기가 16의 배수가 되게 하기 위해서 마지막에 사용하지 않는 float를 선언함.
-	// sizeof(LightBufferType)가 28Byte인 크기로 CreateBuffer을 하면 함수에서는 무조건 16배수 크기를 요구하기 때문에 실패할 수 있다.
+	struct CameraBufferType 
+	{
+		D3DXVECTOR3 cameraPosition;
+		float padding; // 16배수
+	};
+
 	struct LightBufferType
 	{
 		D3DXVECTOR4 diffuseColor;
@@ -46,6 +53,16 @@ private:
 		float _padding;
 	};
 
+	// T10,  각 변수들이 16byte로 정렬되도록 변수 배치
+	struct LightBufferType_10
+	{
+		D3DXVECTOR4 ambientColor;
+		D3DXVECTOR4 diffuseColor;
+		D3DXVECTOR3 lightDirection;
+		float specularPower;
+		D3DXVECTOR4 specularColor;
+	};
+
 public:
 	CLightshaderClass(void);
 	CLightshaderClass(const CLightshaderClass& other);
@@ -56,6 +73,8 @@ public:
 	bool Render(ID3D11DeviceContext* _devContext, int idxCount, D3DXMATRIX mWorld, D3DXMATRIX mView, D3DXMATRIX mProjection, ID3D11ShaderResourceView *_resourceView, D3DXVECTOR3 _lightDesc, D3DXVECTOR4 _DiffuseColor);
 	// T 9
 	bool Render(ID3D11DeviceContext* _devContext, int idxCount, D3DXMATRIX mWorld, D3DXMATRIX mView, D3DXMATRIX mProjection, ID3D11ShaderResourceView *_resourceView, D3DXVECTOR3 _lightDesc, D3DXVECTOR4 _DiffuseColor, D3DXVECTOR4 _ambientColor);
+	// T10
+	bool Render(ID3D11DeviceContext* _devContext, int idxCount, D3DXMATRIX mWorld, D3DXMATRIX mView, D3DXMATRIX mProjection, ID3D11ShaderResourceView *_resourceView, D3DXVECTOR3 _lightDesc, D3DXVECTOR4 _DiffuseColor, D3DXVECTOR4 _ambientColor, D3DXVECTOR3 _camPosition, D3DXVECTOR4 _specColor, float _specPower);
 
 private:
 	bool InitializeShader(ID3D11Device* _device, HWND _hWnd, WCHAR* _vsFileName, WCHAR* _psFileName);
@@ -64,7 +83,9 @@ private:
 
 	bool SetShaderParameters(ID3D11DeviceContext* _devContext, D3DXMATRIX mWorld, D3DXMATRIX mView, D3DXMATRIX mProjection, ID3D11ShaderResourceView *_resourceView, D3DXVECTOR3 _lightDesc, D3DXVECTOR4 _DiffuseColor );
 	// T9
-		bool SetShaderParameters(ID3D11DeviceContext* _devContext, D3DXMATRIX mWorld, D3DXMATRIX mView, D3DXMATRIX mProjection, ID3D11ShaderResourceView *_resourceView, D3DXVECTOR3 _lightDesc, D3DXVECTOR4 _DiffuseColor , D3DXVECTOR4 _ambientColor);
+	bool SetShaderParameters(ID3D11DeviceContext* _devContext, D3DXMATRIX mWorld, D3DXMATRIX mView, D3DXMATRIX mProjection, ID3D11ShaderResourceView *_resourceView, D3DXVECTOR3 _lightDesc, D3DXVECTOR4 _DiffuseColor , D3DXVECTOR4 _ambientColor);
+	// T10
+	bool SetShaderParameters(ID3D11DeviceContext* _devContext, D3DXMATRIX mWorld, D3DXMATRIX mView, D3DXMATRIX mProjection, ID3D11ShaderResourceView *_resourceView, D3DXVECTOR3 _lightDesc, D3DXVECTOR4 _DiffuseColor , D3DXVECTOR4 _ambientColor, D3DXVECTOR3 _camPosition, D3DXVECTOR4 _specColor, float _specPower);
 	void RenderShader(ID3D11DeviceContext* _devContext, int idxCount);
 
 	ID3D11VertexShader* m_vertexShader;
@@ -73,6 +94,9 @@ private:
 	ID3D11SamplerState* m_sampleState;
 	ID3D11Buffer* m_mBuffer;
 	ID3D11Buffer* m_lBuffer;
+
+	// 카메라 위치, 상수 버퍼
+	ID3D11Buffer* m_cBuffer;
 
 	// saemi
 	int TutorialNum;

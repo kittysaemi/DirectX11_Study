@@ -18,7 +18,16 @@ CGraphicsClass::CGraphicsClass(void)
 	m_pLightShader = 0;
 	m_pLight = 0;
 
-	// saemi			// Yellow	// gray
+	// saemi	
+	// 3D 모델 크기에 따라서 보는 관점 조정 할 필요 있음.
+	CamPos[0] = 0.0f;	// x
+	CamPos[1] = 50.0f;	// y
+	CamPos[2] = -300.0f;	// z
+
+	DirectionP[0] = 1.0f;	
+	DirectionP[1] = 1.0f;	
+	DirectionP[2] = 1.0f;	
+						// Yellow	// gray
 	BGColor[0] = 0.0f;	// 0xff		// 0x5
 	BGColor[1] = 0.0f;	// 0xff		// 0x6
 	BGColor[2] = 0.0f;	// 0x00		// 0x5
@@ -34,6 +43,13 @@ CGraphicsClass::CGraphicsClass(void)
 	AmbientColor[1] = 0.2f;		//0.15f;
 	AmbientColor[2] = 0.2f;		//0.15f;
 	AmbientColor[3] = 1.0f;
+
+	// 반사색, 반사강도
+	SpecularColor[0] = 1.0f;
+	SpecularColor[1] = 1.0f;
+	SpecularColor[2] = 1.0f;
+	SpecularColor[3] = 1.0f;
+	SpecularPower = 32.0f;
 
 }
 
@@ -77,12 +93,7 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 	}
 
 	// set the initial position of the camera.
-	// Cam Move
-	float CamX = 0.0f, CamY = 0.0f, CamZ = 1.0f;
-	CamZ = -10.0f;
-
-
-	m_Camera->SetPosition(CamX, CamY, CamZ);
+	m_Camera->SetPosition(CamPos[0],CamPos[1],CamPos[2]);
 
 
 	// create the model object.
@@ -127,8 +138,9 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 	}
 	if(TUTORIALTYPE >= 7)
 	{
-		if(!m_Model->Initialize(m_D3D->GetDevice(), "../DirectX11_Engine/data/Cube.txt", L"../DirectX11_Engine/data/wood.dds" ))
+		//if(!m_Model->Initialize(m_D3D->GetDevice(), "../DirectX11_Engine/data/Cube.txt", L"../DirectX11_Engine/data/wood.dds" ))
 		//if(!m_Model->Initialize(m_D3D->GetDevice(), "../DirectX11_Engine/data/Moon.txt", L"../DirectX11_Engine/data/wood.dds" ))
+		if(!m_Model->Initialize(m_D3D->GetDevice(), "../DirectX11_Engine/data/MoonV.txt", L"../DirectX11_Engine/data/MoonM.dds" ))
 		{
 			return false;
 		}
@@ -180,7 +192,11 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 
 	// Initialize the light object.
 	m_pLight->SetDiffuseColor(LightColor[0], LightColor[1], LightColor[2], LightColor[3]);
-	m_pLight->SetDirection(0.0f, 0.0f, 1.0f);
+	m_pLight->SetDirection(DirectionP[0], DirectionP[1], DirectionP[2]);
+
+	// T10 반사광
+	m_pLight->SetSpecularColor(SpecularColor[0], SpecularColor[1], SpecularColor[2], SpecularColor[3]);
+	m_pLight->SetSpecularPower(SpecularPower);
 
 
 	return true;
@@ -291,7 +307,7 @@ bool CGraphicsClass::Render()
 		// Update the rotation variable each frame.
 		static float rotation = 0.0f;
 
-		rotation += (float)D3DX_PI * 0.001f;	// 속도 반으로 줄이기
+		rotation += (float)D3DX_PI * 0.001f;	// 속도 줄이기
 		//rotation += (float)D3DX_PI * 0.01f;
 		if(rotation > 360.0f)
 		{
@@ -336,9 +352,17 @@ bool CGraphicsClass::Render()
 		}
 	}
 
-	if(TUTORIALTYPE >= 9)
+	if(TUTORIALTYPE == 9)
 	{
 		if(!m_pLightShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), _worldMatrix, _viewMatrix, _projectionMatrix, m_Model->GetTexture(), m_pLight->GetDirection(), m_pLight->GetDiffuseColor(), m_pLight->GetAmbientColor() ))
+		{
+			return false;
+		}
+	}
+
+	if(TUTORIALTYPE >= 10)
+	{
+		if(!m_pLightShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), _worldMatrix, _viewMatrix, _projectionMatrix, m_Model->GetTexture(), m_pLight->GetDirection(), m_pLight->GetDiffuseColor(), m_pLight->GetAmbientColor(), m_Camera->GetPosition(), m_pLight->GetSpecularColor(), m_pLight->GetSpecularPower()))
 		{
 			return false;
 		}

@@ -30,7 +30,19 @@ void CLightClass::SetAmbientColor(float r, float g, float b, float a)
 	m_ambientColor = D3DXVECTOR4(r,g,b,a);
 	return;
 }
+void CLightClass::SetSpecularColor(float r, float g, float b, float a)
+{
+	m_specularColor = D3DXVECTOR4(r,g,b,a);
+	return;
+}
+void CLightClass::SetSpecularPower(float power)
+{
+	m_specularPower = power;
+	return;
+}
 
+float CLightClass::GetSpecularPower(){return m_specularPower;}
+D3DXVECTOR4 CLightClass::GetSpecularColor(){return m_specularColor;}
 D3DXVECTOR3 CLightClass::GetDirection(){return m_direction;}
 D3DXVECTOR4 CLightClass::GetDiffuseColor(){return m_diffuseColor;}
 D3DXVECTOR4 CLightClass::GetAmbientColor(){return m_ambientColor;}

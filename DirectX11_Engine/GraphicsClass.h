@@ -29,7 +29,7 @@ const bool FULL_SCREEN = true;//true;
 const bool VSYNC_ENABLED = false;//false;
 const float SCREEN_DEPTH = 1000.0f;
 const float SCREEN_NEAR = 0.1f;
-const int TUTORIALTYPE = 9;
+const int TUTORIALTYPE = 10;
 
 class CGraphicsClass
 {
@@ -64,9 +64,13 @@ private:
 	CLightClass* m_pLight;
 
 	// saemi
+	float CamPos[3];		// 카메라 위치 ( 화면 바라보는 방향 )
+	float DirectionP[3];
 	float BGColor[4];
 	float LightColor[4];
 	float AmbientColor[4];
+	float SpecularColor[4];	// 반사색
+	float SpecularPower;	// 반사강도
 };
 
 
