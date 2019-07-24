@@ -23,7 +23,7 @@ CTextureshaderclass::~CTextureshaderclass(void)
 bool CTextureshaderclass::Initialize(ID3D11Device* _device, HWND _hWnd)
 {
 	// Initialize the vertex and pixel shaders.
-	if(!InitializeShader(_device, _hWnd, L"../DirectX11_Engine/Texture.vs", L"../DirectX11_Engine/Texture.ps"))
+	if(!InitializeShader(_device, _hWnd, L"../DirectX11_Engine/HLSL/Texture.vs", L"../DirectX11_Engine/HLSL/Texture.ps"))
 	{
 		OutputDebugStringA("Textureshaderclass Initalize faild");
 		return false;

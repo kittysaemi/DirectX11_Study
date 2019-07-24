@@ -9,6 +9,7 @@ CD3DClass::CD3DClass(void)
 	m_dpRenderTargetView = 0;
 	m_dpTexture2DBuffer = 0;
 	m_dpDepthStencilState =0;
+	m_dpDisableDepthStencilState = 0;
 	m_dpDepthStencilView = 0;
 	m_dpRasterizerState = 0;
 }
@@ -441,6 +442,30 @@ bool CD3DClass::Initialize(int scW, int scH, bool vsync, HWND hWnd, bool fullscr
 	D3DXMatrixOrthoLH(&m_matrixOther, (float)scW, (float)scH, scNear, scDepth);
 
 
+	// 2D ·»´õ¸µÀ» À§ÇÑ DepthEnalbe = false ½ºÅÙ½Ç Desc
+	D3D11_DEPTH_STENCIL_DESC _depthDisableStencilDesc;
+	ZeroMemory(&_depthDisableStencilDesc, sizeof(_depthDisableStencilDesc));
+
+	_depthDisableStencilDesc.DepthEnable = fullscreenMode;
+	_depthDisableStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	_depthDisableStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	_depthDisableStencilDesc.StencilEnable = true;
+	_depthDisableStencilDesc.StencilReadMask = 0xFF;
+	_depthDisableStencilDesc.StencilWriteMask = 0xFF;
+	_depthDisableStencilDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	_depthDisableStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+	_depthDisableStencilDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	_depthDisableStencilDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+	_depthDisableStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	_depthDisableStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+	_depthDisableStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	_depthDisableStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+	hResult = m_dpDevice->CreateDepthStencilState(&_depthDisableStencilDesc, &m_dpDisableDepthStencilState);
+	if(FAILED(hResult))
+		return false;
+
+
 	return true;
 }
 
@@ -448,6 +473,12 @@ void CD3DClass::Shutdown()
 {
 	if(m_dpSwapChain)
 		m_dpSwapChain->SetFullscreenState(FALSE, NULL);
+
+	if(m_dpDisableDepthStencilState)
+	{
+		m_dpDisableDepthStencilState->Release();
+		m_dpDisableDepthStencilState = 0;
+	}
 
 	if(m_dpRasterizerState)
 	{
@@ -557,4 +588,13 @@ void CD3DClass::GetVideoCardInfo(char* cardName, int& mem)
 	strcpy_s(cardName, 128, m_sVideoCardDescription);
 	mem = m_nVideoCardMemeory;
 	return;
+}
+
+void CD3DClass::TurnZBufferOn()
+{
+	m_dpDeviceContext->OMSetDepthStencilState(m_dpDepthStencilState, 1);
+}
+void CD3DClass::TurnZBufferOff()
+{
+	m_dpDeviceContext->OMSetDepthStencilState(m_dpDisableDepthStencilState, 1);
 }

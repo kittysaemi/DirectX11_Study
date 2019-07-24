@@ -18,11 +18,14 @@ CGraphicsClass::CGraphicsClass(void)
 	m_pLightShader = 0;
 	m_pLight = 0;
 
+	// T11
+	m_Bitmap = 0;
+
 	// saemi	
 	// 3D 모델 크기에 따라서 보는 관점 조정 할 필요 있음.
 	CamPos[0] = 0.0f;	// x
-	CamPos[1] = 50.0f;	// y
-	CamPos[2] = -300.0f;	// z
+	CamPos[1] = 0.0f;	// y
+	CamPos[2] = -10.0f;	// z  // MoonV 구의 경우 -300은 되야 함.
 
 	DirectionP[0] = 1.0f;	
 	DirectionP[1] = 1.0f;	
@@ -95,109 +98,129 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 	// set the initial position of the camera.
 	m_Camera->SetPosition(CamPos[0],CamPos[1],CamPos[2]);
 
-
-	// create the model object.
-	m_Model = new CModelClass;
-	if(!m_Model)
+	if(TUTORIALTYPE < 11)
 	{
-		OutputDebugStringA("Could not Create Modelclass");
-		return false;
-	}
-	
-	// Initialize the model object.
-	if(TUTORIALTYPE <= 4)
-	{
-		if(!m_Model->Initialize(m_D3D->GetDevice()))
+		// create the model object.
+		m_Model = new CModelClass;
+		if(!m_Model)
 		{
-			return false;
-		}
-		// create the color shader object.
-		m_ColorShader = new CColorShaderClass;
-		if(!m_ColorShader)
-		{
-			OutputDebugStringA("Could not Create ColorShaderclass");
+			OutputDebugStringA("Could not Create Modelclass");
 			return false;
 		}
 
-		// Initialize the color shader object.
-		if(!m_ColorShader->Initialize(m_D3D->GetDevice(), hWnd))
+
+		// Initialize the model object.
+		if(TUTORIALTYPE <= 4)
 		{
-			OutputDebugStringA("Could not initialize the color shader object.");
+			if(!m_Model->Initialize(m_D3D->GetDevice()))
+			{
+				return false;
+			}
+			// create the color shader object.
+			m_ColorShader = new CColorShaderClass;
+			if(!m_ColorShader)
+			{
+				OutputDebugStringA("Could not Create ColorShaderclass");
+				return false;
+			}
+
+			// Initialize the color shader object.
+			if(!m_ColorShader->Initialize(m_D3D->GetDevice(), hWnd))
+			{
+				OutputDebugStringA("Could not initialize the color shader object.");
+				return false;
+			}
+
+			return true;
+		}
+		if(TUTORIALTYPE >= 5 && TUTORIALTYPE <= 6)
+		{	
+			if(!m_Model->Initialize(m_D3D->GetDevice(), L"../DirectX11_Engine/data/seafloor.dds"))	
+			{
+				OutputDebugStringA("Could not initialize the model object.");
+				return false;
+			}		
+		}
+		if(TUTORIALTYPE >= 7)
+		{
+			//if(!m_Model->Initialize(m_D3D->GetDevice(), "../DirectX11_Engine/data/Cube.txt", L"../DirectX11_Engine/data/wood.dds" ))
+			//if(!m_Model->Initialize(m_D3D->GetDevice(), "../DirectX11_Engine/data/Moon.txt", L"../DirectX11_Engine/data/wood.dds" ))
+			if(!m_Model->Initialize(m_D3D->GetDevice(), "../DirectX11_Engine/data/MoonV.txt", L"../DirectX11_Engine/data/MoonM.dds" ))
+			{
+				return false;
+			}
+		}
+
+		if(TUTORIALTYPE == 5)
+		{
+			// create the texture shader object.
+			m_TextureShader = new CTextureshaderclass;
+			if(!m_TextureShader)
+			{
+				return false;
+			}
+
+			// Initalize the texture shader object.
+			if(!m_TextureShader->Initialize(m_D3D->GetDevice(), hWnd))
+			{
+				return false;
+			}
+			return true;
+		}
+
+		// T6
+		// Create the light shader object.
+		m_pLightShader = new CLightshaderClass;
+		if(!m_pLightShader)
+		{
 			return false;
 		}
 
-		return true;
+		// Initialize the light shader object.
+		if(!m_pLightShader->Initialize(m_D3D->GetDevice(), hWnd, TUTORIALTYPE))
+		{
+			return false;
+		}
+
+		// Create the light object.
+		m_pLight = new CLightClass;
+		if(!m_pLight)
+		{
+			return false;
+		}
+
+		// 조명의 색상을 자주색으로 하고 그 방향을 z축의 양의 값으로 합니다.
+
+
+		// T9 - 주변광 추가
+		m_pLight->SetAmbientColor(AmbientColor[0], AmbientColor[1], AmbientColor[2], AmbientColor[3]);
+
+		// Initialize the light object.
+		m_pLight->SetDiffuseColor(LightColor[0], LightColor[1], LightColor[2], LightColor[3]);
+		m_pLight->SetDirection(DirectionP[0], DirectionP[1], DirectionP[2]);
+
+		// T10 반사광
+		m_pLight->SetSpecularColor(SpecularColor[0], SpecularColor[1], SpecularColor[2], SpecularColor[3]);
+		m_pLight->SetSpecularPower(SpecularPower);
 	}
-	if(TUTORIALTYPE >= 5 && TUTORIALTYPE <= 6)
+	else if(TUTORIALTYPE == 11)
 	{	
-		if(!m_Model->Initialize(m_D3D->GetDevice(), L"../DirectX11_Engine/data/seafloor.dds"))	
-		{
-			OutputDebugStringA("Could not initialize the model object.");
-			return false;
-		}		
-	}
-	if(TUTORIALTYPE >= 7)
-	{
-		//if(!m_Model->Initialize(m_D3D->GetDevice(), "../DirectX11_Engine/data/Cube.txt", L"../DirectX11_Engine/data/wood.dds" ))
-		//if(!m_Model->Initialize(m_D3D->GetDevice(), "../DirectX11_Engine/data/Moon.txt", L"../DirectX11_Engine/data/wood.dds" ))
-		if(!m_Model->Initialize(m_D3D->GetDevice(), "../DirectX11_Engine/data/MoonV.txt", L"../DirectX11_Engine/data/MoonM.dds" ))
-		{
-			return false;
-		}
-	}
-
-	if(TUTORIALTYPE == 5)
-	{
 		// create the texture shader object.
 		m_TextureShader = new CTextureshaderclass;
 		if(!m_TextureShader)
-		{
 			return false;
-		}
 
 		// Initalize the texture shader object.
 		if(!m_TextureShader->Initialize(m_D3D->GetDevice(), hWnd))
-		{
 			return false;
-		}
-		return true;
+
+		m_Bitmap = new CBitmapClass;
+		if(!m_Bitmap)
+			return false;
+
+		if(!m_Bitmap->Initialize(m_D3D->GetDevice(), scW, scH, L"../DirectX11_Engine/data/wood.dds", 1200, 800))
+			return false;
 	}
-
-	// T6
-	// Create the light shader object.
-	m_pLightShader = new CLightshaderClass;
-	if(!m_pLightShader)
-	{
-		return false;
-	}
-
-	// Initialize the light shader object.
-	if(!m_pLightShader->Initialize(m_D3D->GetDevice(), hWnd, TUTORIALTYPE))
-	{
-		return false;
-	}
-
-	// Create the light object.
-	m_pLight = new CLightClass;
-	if(!m_pLight)
-	{
-		return false;
-	}
-
-	// 조명의 색상을 자주색으로 하고 그 방향을 z축의 양의 값으로 합니다.
-
-
-	// T9 - 주변광 추가
-	m_pLight->SetAmbientColor(AmbientColor[0], AmbientColor[1], AmbientColor[2], AmbientColor[3]);
-
-	// Initialize the light object.
-	m_pLight->SetDiffuseColor(LightColor[0], LightColor[1], LightColor[2], LightColor[3]);
-	m_pLight->SetDirection(DirectionP[0], DirectionP[1], DirectionP[2]);
-
-	// T10 반사광
-	m_pLight->SetSpecularColor(SpecularColor[0], SpecularColor[1], SpecularColor[2], SpecularColor[3]);
-	m_pLight->SetSpecularPower(SpecularPower);
-
 
 	return true;
 
@@ -206,6 +229,15 @@ void CGraphicsClass::Shutdown()
 {
 	// The TextureShaderClass object is also released in the shutdown function.
 	// Release the thing object.
+
+	//////////////////////////////////////////////////////////////////////////
+	// T11
+	if(m_Bitmap)
+	{
+		m_Bitmap->Shutdown();
+		delete m_Bitmap;
+		m_Bitmap = 0;
+	}
 
 	//////////////////////////////////////////////////////////////////////////
 	// T6
@@ -302,73 +334,90 @@ bool CGraphicsClass::Render()
 	m_D3D->GetProjectionMatrix(_projectionMatrix);
 
 
-	if(TUTORIALTYPE >= 6)
+	if(TUTORIALTYPE < 11)
 	{
-		// Update the rotation variable each frame.
-		static float rotation = 0.0f;
-
-		rotation += (float)D3DX_PI * 0.001f;	// 속도 줄이기
-		//rotation += (float)D3DX_PI * 0.01f;
-		if(rotation > 360.0f)
+		if(TUTORIALTYPE >= 6)
 		{
-			rotation -= 360.0f;
+			// Update the rotation variable each frame.
+			static float rotation = 0.0f;
+
+			rotation += (float)D3DX_PI * 0.001f;	// 속도 줄이기
+			//rotation += (float)D3DX_PI * 0.01f;
+			if(rotation > 360.0f)
+			{
+				rotation -= 360.0f;
+			}
+
+			// 월드 행렬을 회전값만큼 회전시켜 이 행렬을 이용하여 삼각형을 그릴 떄 그 값만큼 회전되어 보이게 한다.
+			// Rotate the world matrix by the rotation value so that the triangle will spin.
+			D3DXMatrixRotationY(&_worldMatrix, rotation);
 		}
 
-		// 월드 행렬을 회전값만큼 회전시켜 이 행렬을 이용하여 삼각형을 그릴 떄 그 값만큼 회전되어 보이게 한다.
-		// Rotate the world matrix by the rotation value so that the triangle will spin.
-		D3DXMatrixRotationY(&_worldMatrix, rotation);
+		// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
+		m_Model->Render(m_D3D->GetDeviceContext());
+
+
+		// 튜토리얼 버전에 따라, 랜더 방식 변경
+		if(TUTORIALTYPE <= 4)
+		{
+			// Render the model using the color shader.
+			if(!m_ColorShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), _worldMatrix, _viewMatrix, _projectionMatrix))
+			{
+				OutputDebugStringA(" Graphics Render / ColorShader Render Faild");
+				return false;
+			}
+		}
+
+		if(TUTORIALTYPE == 5 )
+		{	
+			// Render the model using the texture shader.
+			if(!m_TextureShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), _worldMatrix, _viewMatrix, _projectionMatrix, m_Model->GetTexture()))
+			{
+				return false;
+			}
+		}
+
+		if(TUTORIALTYPE >= 6 && TUTORIALTYPE <= 8)
+		{
+			if(!m_pLightShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), _worldMatrix, _viewMatrix, _projectionMatrix, m_Model->GetTexture(), m_pLight->GetDirection(), m_pLight->GetDiffuseColor()))
+			{
+				return false;
+			}
+		}
+
+		if(TUTORIALTYPE == 9)
+		{
+			if(!m_pLightShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), _worldMatrix, _viewMatrix, _projectionMatrix, m_Model->GetTexture(), m_pLight->GetDirection(), m_pLight->GetDiffuseColor(), m_pLight->GetAmbientColor() ))
+			{
+				return false;
+			}
+		}
+
+		if(TUTORIALTYPE == 10)
+		{
+			if(!m_pLightShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), _worldMatrix, _viewMatrix, _projectionMatrix, m_Model->GetTexture(), m_pLight->GetDirection(), m_pLight->GetDiffuseColor(), m_pLight->GetAmbientColor(), m_Camera->GetPosition(), m_pLight->GetSpecularColor(), m_pLight->GetSpecularPower()))
+			{
+				return false;
+			}
+		}
 
 	}
-
-	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
-	m_Model->Render(m_D3D->GetDeviceContext());
-
-
-	// 튜토리얼 버전에 따라, 랜더 방식 변경
-	if(TUTORIALTYPE <= 4)
+	else if(TUTORIALTYPE >= 11)
 	{
-		// Render the model using the color shader.
-		if(!m_ColorShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), _worldMatrix, _viewMatrix, _projectionMatrix))
- 		{
-			OutputDebugStringA(" Graphics Render / ColorShader Render Faild");
+		D3DXMATRIX otherMatrix;
+		m_D3D->GetOtherMatrix(otherMatrix);
+
+		m_D3D->TurnZBufferOff();
+
+		if(!m_Bitmap->Render(m_D3D->GetDeviceContext(), 500, 500))
 			return false;
-		}
-	}
 
-	if(TUTORIALTYPE == 5 )
-	{	
-		// Render the model using the texture shader.
-		if(!m_TextureShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), _worldMatrix, _viewMatrix, _projectionMatrix, m_Model->GetTexture()))
-		{
+		if(!m_TextureShader->Render(m_D3D->GetDeviceContext(), m_Bitmap->GetIndexCount(), _worldMatrix, _viewMatrix, otherMatrix, m_Bitmap->GetTexture()))
 			return false;
-		}
+
+		m_D3D->TurnZBufferOn();
+
 	}
-
-	if(TUTORIALTYPE >= 6 && TUTORIALTYPE <= 8)
-	{
-		if(!m_pLightShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), _worldMatrix, _viewMatrix, _projectionMatrix, m_Model->GetTexture(), m_pLight->GetDirection(), m_pLight->GetDiffuseColor()))
-		{
-			return false;
-		}
-	}
-
-	if(TUTORIALTYPE == 9)
-	{
-		if(!m_pLightShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), _worldMatrix, _viewMatrix, _projectionMatrix, m_Model->GetTexture(), m_pLight->GetDirection(), m_pLight->GetDiffuseColor(), m_pLight->GetAmbientColor() ))
-		{
-			return false;
-		}
-	}
-
-	if(TUTORIALTYPE >= 10)
-	{
-		if(!m_pLightShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), _worldMatrix, _viewMatrix, _projectionMatrix, m_Model->GetTexture(), m_pLight->GetDirection(), m_pLight->GetDiffuseColor(), m_pLight->GetAmbientColor(), m_Camera->GetPosition(), m_pLight->GetSpecularColor(), m_pLight->GetSpecularPower()))
-		{
-			return false;
-		}
-	}
-
-
 	// Present the rendered scene to the screen.
 	m_D3D->EndScene();
 	//////////////////////////////////////////////////////////////////////////

@@ -23,13 +23,16 @@
 #include "LightshaderClass.h"	
 #include "LightClass.h"
 
+// tutorial 11
+#include "BitmapClass.h"
+
 //////////////////////////////////////////////////////////////////////////
 
 const bool FULL_SCREEN = true;//true;
 const bool VSYNC_ENABLED = false;//false;
 const float SCREEN_DEPTH = 1000.0f;
 const float SCREEN_NEAR = 0.1f;
-const int TUTORIALTYPE = 10;
+const int TUTORIALTYPE = 11;
 
 class CGraphicsClass
 {
@@ -62,6 +65,9 @@ private:
 	// T6
 	CLightshaderClass* m_pLightShader;
 	CLightClass* m_pLight;
+
+	// T11
+	CBitmapClass * m_Bitmap;
 
 	// saemi
 	float CamPos[3];		// 카메라 위치 ( 화면 바라보는 방향 )

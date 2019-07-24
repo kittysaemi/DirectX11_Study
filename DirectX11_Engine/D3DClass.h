@@ -3,6 +3,9 @@
 // tutorial 3 | DirectX 11의 초기화
 //////////////////////////////////////////////////////////////////////////
 
+// Tutorial 11
+// Z buffer On/Off Function Additon.
+
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "d3dx11.lib")
@@ -41,6 +44,10 @@ public:
 
 	void GetVideoCardInfo(char* cardName, int& mem);
 
+	// Z buffer On/Off
+	void TurnZBufferOn();
+	void TurnZBufferOff();
+
 private:
 	bool m_bVsyncEnable;
 	int m_nVideoCardMemeory;
@@ -51,6 +58,7 @@ private:
 	ID3D11RenderTargetView* m_dpRenderTargetView;
 	ID3D11Texture2D* m_dpTexture2DBuffer;
 	ID3D11DepthStencilState* m_dpDepthStencilState;
+	ID3D11DepthStencilState* m_dpDisableDepthStencilState;
 	ID3D11DepthStencilView* m_dpDepthStencilView;
 	ID3D11RasterizerState* m_dpRasterizerState;
 	D3DXMATRIX m_matrixProjection;
