@@ -121,26 +121,48 @@ void CFontClass::BuildVertexArray(void* buffer, char * strData, float drawX, flo
 		}
 		else
 		{
-			ptrVertex[idx].position = D3DXVECTOR3(drawX, drawY, 0.0f);
-			ptrVertex[idx++].texture = D3DXVECTOR2(m_structFont[nletterIdx].nLeft, 0.0f);
+			DrawPositionCalculation(pLeft, pTop, drawX, drawY, nletterIdx, ptrVertex[idx].position, ptrVertex[idx].texture);		idx++;
+			DrawPositionCalculation(pRight, pBottom, drawX, drawY, nletterIdx, ptrVertex[idx].position, ptrVertex[idx].texture);	idx++;
+			DrawPositionCalculation(pLeft, pBottom, drawX, drawY, nletterIdx, ptrVertex[idx].position, ptrVertex[idx].texture);		idx++;
 
-			ptrVertex[idx].position = D3DXVECTOR3((drawX + m_structFont[nletterIdx].nSize), (drawY - 16), 0.0f);
-			ptrVertex[idx++].texture = D3DXVECTOR2(m_structFont[nletterIdx].nRight, 1.0f);
-
-			ptrVertex[idx].position = D3DXVECTOR3(drawX, (drawY - 16), 0.0f);
-			ptrVertex[idx++].texture = D3DXVECTOR2(m_structFont[nletterIdx].nLeft, 1.0f);
-
-			ptrVertex[idx].position = D3DXVECTOR3(drawX, drawY, 0.0f);
-			ptrVertex[idx++].texture = D3DXVECTOR2(m_structFont[nletterIdx].nLeft, 0.0f);
-
-			ptrVertex[idx].position = D3DXVECTOR3((drawX + m_structFont[nletterIdx].nSize), drawY, 0.0f);
-			ptrVertex[idx++].texture = D3DXVECTOR2(m_structFont[nletterIdx].nRight, 0.0f);
-
-			ptrVertex[idx].position = D3DXVECTOR3((drawX + m_structFont[nletterIdx].nSize), (drawY - 16), 0.0f);
-			ptrVertex[idx++].texture = D3DXVECTOR2(m_structFont[nletterIdx].nRight, 1.0f);
+			DrawPositionCalculation(pLeft, pTop, drawX, drawY, nletterIdx, ptrVertex[idx].position, ptrVertex[idx].texture);		idx++;
+			DrawPositionCalculation(pRight, pTop, drawX, drawY, nletterIdx, ptrVertex[idx].position, ptrVertex[idx].texture);		idx++;
+			DrawPositionCalculation(pRight, pBottom, drawX, drawY, nletterIdx, ptrVertex[idx].position, ptrVertex[idx].texture);	idx++;
 
 			drawX = drawX + m_structFont[nletterIdx].nSize + 1.0f;
 		}
 	}
 	
+}
+
+void CFontClass::DrawPositionCalculation(HorizontalType _hType, VerticalType _vType,float drawX, float drawY, int letterIdx, D3DXVECTOR3 &positon, D3DXVECTOR2 &texture)
+{
+	float dX = drawX, dY = drawY, dZ = 0.0f;
+	float uvX = 0.0f, uvY = 0.0f;
+
+	switch (_hType)
+	{
+	case pLeft:
+		dX = drawX;
+		uvX = m_structFont[letterIdx].nLeft;
+		break;
+	case pRight:
+		dX = drawX + m_structFont[letterIdx].nSize;
+		uvX = m_structFont[letterIdx].nRight;
+		break;
+	}
+	switch(_vType)
+	{
+	case pTop:
+		dY = drawY;
+		uvY = 0.0f;
+		break;
+	case pBottom:
+		dY = drawY - 16;
+		uvY = 1.0f;
+		break;
+	}
+
+	positon = D3DXVECTOR3(dX, dY, dZ);
+	texture = D3DXVECTOR2(uvX, uvY);
 }

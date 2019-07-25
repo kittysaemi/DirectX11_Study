@@ -31,7 +31,7 @@
 
 //////////////////////////////////////////////////////////////////////////
 
-const bool FULL_SCREEN = true;//true;
+const bool FULL_SCREEN = false;//true;
 const bool VSYNC_ENABLED = true;//false;
 const float SCREEN_DEPTH = 1000.0f;
 const float SCREEN_NEAR = 0.1f;

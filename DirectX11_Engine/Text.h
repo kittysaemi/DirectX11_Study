@@ -62,8 +62,7 @@ private:
 	CFontShader * m_pFontShader;
 	ScreenSizeInfo m_nScreenSize;
 	D3DXMATRIX m_baseViewMatrix;
-	SentenceType * m_sentence1;
-	SentenceType * m_sentence2;
+	SentenceType * m_sentence[10];
 };
 
 #endif

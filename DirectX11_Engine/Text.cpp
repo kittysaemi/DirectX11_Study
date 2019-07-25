@@ -6,8 +6,10 @@ CText::CText(void)
 	m_pFont = 0;
 	m_pFontShader = 0;
 
-	m_sentence1 = 0;
-	m_sentence2 = 0;
+	int nC = sizeof(m_sentence) / sizeof(m_sentence[0]);
+	for(int i=0; i<nC; i++)
+		m_sentence[i] = 0;
+
 }
 CText::CText(const CText& other)
 {
@@ -37,30 +39,34 @@ bool CText::Initialize(ID3D11Device * _device, ID3D11DeviceContext * _devContext
 	if(!m_pFontShader->Initialize(_device, _hWnd))
 		return false;
 
-	FontColor fColor;
-	fColor.red = 1.0f;
-	fColor.green = 1.0f;
-	fColor.blue = 1.0f;
+	char * strList[20] = {"First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eight times", "Nine times", "Heat burning"};
+	float colorRed[10] = {0xCC, 0xFF, 0xFF, 0x00, 0x33, 0x00, 0x99, 0x66, 0x33, 0xFF};
+	float colorGreen[10] = {0x00, 0x99, 0xFF, 0xCC, 0x00, 0x00, 0x00, 0x33, 0xFF, 0x66};
+	float colorBlue[10] = {0x00, 0x00, 0x00, 0x00, 0xFF, 0x66, 0x99, 0x00, 0xCC, 0x99};
 
-	if(!InitializeSentence(&m_sentence1, 16, _device))
-		return false;
-	if(!UpdateSentence(m_sentence1, "Hello", 100, 100, fColor, _devContext ))
-		return false;
 
-	fColor.blue = 0.0f;
+	int nC = sizeof(m_sentence) / sizeof(m_sentence[0]);
+	for(int i=0; i<nC; i++)
+	{
+		FontColor fColor;
+		fColor.red = colorRed[i];
+		fColor.green = colorGreen[i];
+		fColor.blue = colorBlue[i];
 
-	if(!InitializeSentence(&m_sentence2, 16, _device))
-		return false;
-	if(!UpdateSentence(m_sentence2, "Goodbye", 100, 200, fColor, _devContext))
-		return false;
+		if(!InitializeSentence(&m_sentence[i], strlen(strList[i]), _device))
+			return false;
+		if(!UpdateSentence(m_sentence[i], strList[i], 50, 100 + ( i * 20 ), fColor, _devContext ))
+			return false;
+	}
 
 	return true;
 }
 
 void CText::Shutdown()
 {
-	ReleaseSentence(&m_sentence1);
-	ReleaseSentence(&m_sentence2);
+	int nC = sizeof(m_sentence) / sizeof(m_sentence[0]);
+	for(int i=0; i<nC; i++)
+		ReleaseSentence(&m_sentence[i]);
 
 	if(m_pFontShader)
 	{
@@ -77,11 +83,10 @@ void CText::Shutdown()
 }
 bool CText::Render(ID3D11DeviceContext * _devContext, D3DXMATRIX _worldMatrix, D3DXMATRIX _orthoMatrix)
 {
-	if(!RenderSetence(_devContext, m_sentence1, _worldMatrix, _orthoMatrix))
-		return false;
-
-	if(!RenderSetence(_devContext, m_sentence2, _worldMatrix, _orthoMatrix))
-		return false;
+	int nC = sizeof(m_sentence) / sizeof(m_sentence[0]);
+	for(int i=0; i<nC; i++)
+		if(!RenderSetence(_devContext, m_sentence[i], _worldMatrix, _orthoMatrix))
+			return false;
 
 	return true;
 }

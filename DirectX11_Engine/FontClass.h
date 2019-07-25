@@ -27,6 +27,16 @@ private:
 		D3DXVECTOR3 position;
 		D3DXVECTOR2 texture;
 	};
+	enum HorizontalType
+	{
+		pLeft,
+		pRight
+	};
+	enum VerticalType
+	{
+		pTop,
+		pBottom			
+	};
 
 public:
 	CFontClass(void);
@@ -44,6 +54,8 @@ private:
 	void ReleaseFontData();
 	bool LoadTexture(ID3D11Device * _device, WCHAR * _texFileName);
 	void ReleaseTexture();
+
+	void DrawPositionCalculation(HorizontalType _hType, VerticalType _vType, float drawX, float drawY, int letterIdx, D3DXVECTOR3 &positon, D3DXVECTOR2 &texture);
 
 	FontType * m_structFont;
 	CTextureClass * m_pTexture;
