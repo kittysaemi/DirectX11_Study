@@ -12,6 +12,9 @@ CD3DClass::CD3DClass(void)
 	m_dpDisableDepthStencilState = 0;
 	m_dpDepthStencilView = 0;
 	m_dpRasterizerState = 0;
+
+	m_EnableABlendingState = 0;
+	m_DisableABlendingState = 0;
 }
 CD3DClass::CD3DClass(const CD3DClass& other)
 {
@@ -466,6 +469,29 @@ bool CD3DClass::Initialize(int scW, int scH, bool vsync, HWND hWnd, bool fullscr
 		return false;
 
 
+	// Blend State
+	D3D11_BLEND_DESC blendDesc;
+	ZeroMemory(&blendDesc, sizeof(D3D11_BLEND_DESC));
+
+	blendDesc.RenderTarget[0].BlendEnable = TRUE;
+	blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+	blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].RenderTargetWriteMask = 0x0f;
+
+	hResult = m_dpDevice->CreateBlendState(&blendDesc, &m_EnableABlendingState);
+	if(FAILED(hResult))
+		return false;
+
+	blendDesc.RenderTarget[0].BlendEnable = FALSE;
+
+	hResult = m_dpDevice->CreateBlendState(&blendDesc, &m_DisableABlendingState);
+	if(FAILED(hResult))
+		return false;
+
 	return true;
 }
 
@@ -473,6 +499,17 @@ void CD3DClass::Shutdown()
 {
 	if(m_dpSwapChain)
 		m_dpSwapChain->SetFullscreenState(FALSE, NULL);
+
+	if(m_DisableABlendingState)
+	{
+		m_DisableABlendingState->Release();
+		m_DisableABlendingState = 0;
+	}
+	if(m_EnableABlendingState)
+	{
+		m_EnableABlendingState->Release();
+		m_EnableABlendingState = 0;
+	}
 
 	if(m_dpDisableDepthStencilState)
 	{
@@ -597,4 +634,18 @@ void CD3DClass::TurnZBufferOn()
 void CD3DClass::TurnZBufferOff()
 {
 	m_dpDeviceContext->OMSetDepthStencilState(m_dpDisableDepthStencilState, 1);
+}
+
+void CD3DClass::TurnOnAlphaBlending()
+{
+	float blendFactor[4] = {0.0f,};
+
+	m_dpDeviceContext->OMSetBlendState(m_EnableABlendingState, blendFactor, 0xffffffff);
+
+}
+void CD3DClass::TurnOffAlphaBlending()
+{
+	float blendFactor[4] = {0.0f,};
+
+	m_dpDeviceContext->OMSetBlendState(m_DisableABlendingState, blendFactor, 0xffffffff);
 }

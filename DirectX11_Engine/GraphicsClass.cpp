@@ -21,12 +21,9 @@ CGraphicsClass::CGraphicsClass(void)
 	// T11
 	m_Bitmap = 0;
 
-	// saemi	
-	// 3D 모델 크기에 따라서 보는 관점 조정 할 필요 있음.
-	CamPos[0] = 0.0f;	// x
-	CamPos[1] = 0.0f;	// y
-	CamPos[2] = -10.0f;	// z  // MoonV 구의 경우 -300은 되야 함.
+	m_pText = 0;
 
+	// saemi	
 	DirectionP[0] = 1.0f;	
 	DirectionP[1] = 1.0f;	
 	DirectionP[2] = 1.0f;	
@@ -54,6 +51,8 @@ CGraphicsClass::CGraphicsClass(void)
 	SpecularColor[3] = 1.0f;
 	SpecularPower = 32.0f;
 
+	m_MouseInfo.nPosX = 0;
+	m_MouseInfo.nPosY = 0;
 }
 
 CGraphicsClass::CGraphicsClass(const CGraphicsClass& other)
@@ -95,11 +94,13 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 		return false;
 	}
 
-	// set the initial position of the camera.
-	m_Camera->SetPosition(CamPos[0],CamPos[1],CamPos[2]);
 
 	if(TUTORIALTYPE < 11)
 	{
+
+		// set the initial position of the camera.
+		m_Camera->SetPosition(0, 0, -10);
+
 		// create the model object.
 		m_Model = new CModelClass;
 		if(!m_Model)
@@ -189,9 +190,9 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 			return false;
 		}
 
+
+		m_Camera->SetPosition(0, 0, -300);
 		// 조명의 색상을 자주색으로 하고 그 방향을 z축의 양의 값으로 합니다.
-
-
 		// T9 - 주변광 추가
 		m_pLight->SetAmbientColor(AmbientColor[0], AmbientColor[1], AmbientColor[2], AmbientColor[3]);
 
@@ -205,6 +206,9 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 	}
 	else if(TUTORIALTYPE == 11)
 	{	
+		// set the initial position of the camera.
+		m_Camera->SetPosition(0, 0, -10);
+
 		// create the texture shader object.
 		m_TextureShader = new CTextureshaderclass;
 		if(!m_TextureShader)
@@ -221,6 +225,31 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 		if(!m_Bitmap->Initialize(m_D3D->GetDevice(), scW, scH, L"../DirectX11_Engine/data/wood.dds", 1200, 800))
 			return false;
 	}
+	else if(TUTORIALTYPE == 12)
+	{
+		// set the initial position of the camera.
+		m_Camera->SetPosition(0, 0, -1);
+		m_Camera->Render();
+
+		D3DXMATRIX baseViewMatrix;
+		m_Camera->GetViewMatrix(baseViewMatrix);
+
+		m_pText = new CText;
+		if(!m_pText)
+			return false;
+
+		CText::ScreenSizeInfo info;
+		info.screenWidth = scW;
+		info.screenHeight = scH;
+
+		if(!m_pText->Initialize(m_D3D->GetDevice(), m_D3D->GetDeviceContext(), hWnd, info, baseViewMatrix))
+			return false;
+
+	}
+	else
+	{
+		return false;
+	}
 
 	return true;
 
@@ -229,6 +258,15 @@ void CGraphicsClass::Shutdown()
 {
 	// The TextureShaderClass object is also released in the shutdown function.
 	// Release the thing object.
+
+	//////////////////////////////////////////////////////////////////////////
+	// T12
+	if(m_pText)
+	{
+		m_pText->Shutdown();
+		delete m_pText;
+		m_pText = 0;
+	}
 
 	//////////////////////////////////////////////////////////////////////////
 	// T11
@@ -332,6 +370,8 @@ bool CGraphicsClass::Render()
 	m_D3D->GetWorldMatrix(_worldMatrix);
 	D3DXMATRIX _projectionMatrix;
 	m_D3D->GetProjectionMatrix(_projectionMatrix);
+	D3DXMATRIX _orthoMatrix;
+	m_D3D->GetOtherMatrix(_orthoMatrix);
 
 
 	if(TUTORIALTYPE < 11)
@@ -409,11 +449,25 @@ bool CGraphicsClass::Render()
 
 		m_D3D->TurnZBufferOff();
 
-		if(!m_Bitmap->Render(m_D3D->GetDeviceContext(), 500, 500))
-			return false;
+		if(TUTORIALTYPE == 11)
+		{
 
-		if(!m_TextureShader->Render(m_D3D->GetDeviceContext(), m_Bitmap->GetIndexCount(), _worldMatrix, _viewMatrix, otherMatrix, m_Bitmap->GetTexture()))
-			return false;
+			if(!m_Bitmap->Render(m_D3D->GetDeviceContext(), m_MouseInfo.nPosX, m_MouseInfo.nPosY))
+				return false;
+
+			if(!m_TextureShader->Render(m_D3D->GetDeviceContext(), m_Bitmap->GetIndexCount(), _worldMatrix, _viewMatrix, otherMatrix, m_Bitmap->GetTexture()))
+				return false;
+
+		}
+		else if(TUTORIALTYPE == 12)
+		{
+			m_D3D->TurnOnAlphaBlending();
+
+			if(!m_pText->Render(m_D3D->GetDeviceContext(), _worldMatrix, _orthoMatrix))
+				return false;
+
+			m_D3D->TurnOffAlphaBlending();
+		}
 
 		m_D3D->TurnZBufferOn();
 
@@ -441,4 +495,9 @@ void CGraphicsClass::GetCardInfo()
 		
 		OutputDebugStringA(logMessage);
 	}
+}
+void CGraphicsClass::SetMouseInfo(int nX, int nY)
+{
+	m_MouseInfo.nPosX = nX;
+	m_MouseInfo.nPosY = nY;
 }

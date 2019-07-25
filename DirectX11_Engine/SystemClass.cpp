@@ -117,6 +117,13 @@ LRESULT CALLBACK CSystemClass::MessageHandler(HWND hwnd, UINT jumsg, WPARAM wpar
 				m_pInput->KeyUp((unsigned int)wparam);
 			return 0;
 		}
+	case WM_MOUSEMOVE:
+		{
+			if(m_pGraphics)
+				m_pGraphics->SetMouseInfo((int)LOWORD(lparam), (int)HIWORD(lparam));
+
+			return 0;
+		}
 	default:
 		return DefWindowProc(hwnd, jumsg, wparam, lparam);
 	}

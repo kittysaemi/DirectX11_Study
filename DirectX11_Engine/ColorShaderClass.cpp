@@ -20,7 +20,7 @@ CColorShaderClass::~CColorShaderClass(void)
 
 bool CColorShaderClass::Initialize(ID3D11Device * _device, HWND _hWnd)
 {
-	if(!InitializeShader(_device, _hWnd, L"../DirectX11_Engine/Color.vs", L"../DirectX11_Engine/Color.ps"))
+	if(!InitializeShader(_device, _hWnd, L"../DirectX11_Engine/HLSL/Color.vs", L"../DirectX11_Engine/HLSL/Color.ps"))
 	{
 		OutputDebugStringA("Faild, ColorShaderClass InitializeShader");
 		return false;

@@ -26,13 +26,16 @@
 // tutorial 11
 #include "BitmapClass.h"
 
+// tutorial 12
+#include "Text.h"
+
 //////////////////////////////////////////////////////////////////////////
 
 const bool FULL_SCREEN = true;//true;
-const bool VSYNC_ENABLED = false;//false;
+const bool VSYNC_ENABLED = true;//false;
 const float SCREEN_DEPTH = 1000.0f;
 const float SCREEN_NEAR = 0.1f;
-const int TUTORIALTYPE = 11;
+const int TUTORIALTYPE = 12;
 
 class CGraphicsClass
 {
@@ -47,6 +50,7 @@ public:
 
 	// saemi
 	void GetCardInfo();
+	void SetMouseInfo(int nX, int nY);
 
 private:
 	bool Render();
@@ -69,14 +73,23 @@ private:
 	// T11
 	CBitmapClass * m_Bitmap;
 
+	// T12
+	CText * m_pText;
+
 	// saemi
-	float CamPos[3];		// 카메라 위치 ( 화면 바라보는 방향 )
 	float DirectionP[3];
 	float BGColor[4];
 	float LightColor[4];
 	float AmbientColor[4];
 	float SpecularColor[4];	// 반사색
 	float SpecularPower;	// 반사강도
+	struct SMouseClickInfo
+	{
+		int nPosX;
+		int nPosY;
+	};
+	SMouseClickInfo m_MouseInfo;
+
 };
 
 

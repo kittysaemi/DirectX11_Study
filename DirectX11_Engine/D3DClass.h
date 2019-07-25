@@ -48,6 +48,10 @@ public:
 	void TurnZBufferOn();
 	void TurnZBufferOff();
 
+	// Blending On/Off
+	void TurnOnAlphaBlending();
+	void TurnOffAlphaBlending();
+
 private:
 	bool m_bVsyncEnable;
 	int m_nVideoCardMemeory;
@@ -64,6 +68,9 @@ private:
 	D3DXMATRIX m_matrixProjection;
 	D3DXMATRIX m_matrixWorld;
 	D3DXMATRIX m_matrixOther;
+
+	ID3D11BlendState* m_EnableABlendingState;
+	ID3D11BlendState* m_DisableABlendingState;
 };
 
 #endif 

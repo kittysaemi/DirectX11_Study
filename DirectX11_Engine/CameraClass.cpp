@@ -3,7 +3,7 @@
 
 CCameraClass::CCameraClass(void)
 {
-	m_nfPosX = m_nfPosY = m_nfPosZ = m_nfRotX = m_nfRotY = m_nfRotZ = 0.0f;
+	m_nfPos.X = m_nfPos.Y = m_nfPos.Z = m_nfRot.X = m_nfRot.Y = m_nfRot.Z = 0.0f;
 }
 
 CCameraClass::CCameraClass(const CCameraClass & other)
@@ -17,25 +17,24 @@ CCameraClass::~CCameraClass(void)
 
 void CCameraClass::SetPosition(float x, float y, float z)
 {
-	m_nfPosX = x;
-	m_nfPosY = y;
-	m_nfPosZ = z;
-	return;
+	m_nfPos.X = x;
+	m_nfPos.Y = y;
+	m_nfPos.Z = z;
 }
 void CCameraClass::SetRotation(float x, float y, float z)
 {
-	m_nfRotX = x;
-	m_nfRotY = y;
-	m_nfRotZ = z;
+	m_nfRot.X = x;
+	m_nfRot.Y = y;
+	m_nfRot.Z = z;
 }
 
 D3DXVECTOR3 CCameraClass::GetPosition()
 {
-	return D3DXVECTOR3(m_nfPosX, m_nfPosY, m_nfPosZ);
+	return D3DXVECTOR3(m_nfPos.X, m_nfPos.Y, m_nfPos.Z);
 }
 D3DXVECTOR3 CCameraClass::GetRotation()
 {
-	return D3DXVECTOR3(m_nfRotX, m_nfRotY, m_nfRotZ);
+	return D3DXVECTOR3(m_nfRot.X, m_nfRot.Y, m_nfRot.Z);
 }
 
 /*
@@ -55,9 +54,9 @@ void CCameraClass::Render()
 
 	// Setup the position of the camera in the world.
 	D3DXVECTOR3 _positionCamWorld;
-	_positionCamWorld.x = m_nfPosX;
-	_positionCamWorld.y = m_nfPosY;
-	_positionCamWorld.z = m_nfPosZ;
+	_positionCamWorld.x = m_nfPos.X;
+	_positionCamWorld.y = m_nfPos.Y;
+	_positionCamWorld.z = m_nfPos.Z;
 
 	// Setup where the camera is looking by default.
 	D3DXVECTOR3 _CameralookAt;
@@ -67,9 +66,9 @@ void CCameraClass::Render()
 
 	// Set the yaw(Y axis), pitch (X axis), and roll (Z axis) rotations in radians.
 	float RadianP = 0.0174532925f;
-	float _Xaxis_pitch = m_nfRotX * RadianP;
-	float _Yaxis_yaw = m_nfRotY * RadianP;
-	float _Zaxis_roll = m_nfRotZ * RadianP;
+	float _Xaxis_pitch = m_nfRot.X * RadianP;
+	float _Yaxis_yaw = m_nfRot.Y * RadianP;
+	float _Zaxis_roll = m_nfRot.Z * RadianP;
 
 	// Create the rotation matrix from the yaw, pitch, and roll values.
 	D3DXMATRIX _rotationMatrix;

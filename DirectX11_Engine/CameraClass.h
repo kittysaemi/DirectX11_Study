@@ -31,12 +31,21 @@ public:
 	void GetViewMatrix(D3DXMATRIX & _matrix);
 
 private:
-	float m_nfPosX;
-	float m_nfPosY;
-	float m_nfPosZ;
-	float m_nfRotX;
-	float m_nfRotY;
-	float m_nfRotZ;
+	struct CameraPosition
+	{
+		float X;
+		float Y;
+		float Z;
+	};
+	struct CameraRotation
+	{
+		float X;
+		float Y;
+		float Z;
+	};
+
+	CameraPosition m_nfPos;
+	CameraRotation m_nfRot; 
 	D3DXMATRIX m_ViewMatrix;
 };
 

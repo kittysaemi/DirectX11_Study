@@ -13,12 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="HLSL">
-      <UniqueIdentifier>{d99e27e9-e410-4bbb-811d-a13b18363aa1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ModelFormat">
-      <UniqueIdentifier>{e3c652ca-c1a9-4835-94f3-36bddaaa518e}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GraphicsClass.cpp">
@@ -57,6 +51,18 @@
     <ClCompile Include="LightshaderClass.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="BitmapClass.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Text.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="FontClass.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="FontShader.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InputClass.h">
@@ -92,32 +98,20 @@
     <ClInclude Include="LightClass.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="BitmapClass.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Text.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="FontClass.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="FontShader.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Tutorial_Guid_Explan.txt" />
-    <None Include="Color.ps">
-      <Filter>HLSL</Filter>
-    </None>
-    <None Include="Color.vs">
-      <Filter>HLSL</Filter>
-    </None>
-    <None Include="Texture.ps">
-      <Filter>HLSL</Filter>
-    </None>
-    <None Include="Texture.vs">
-      <Filter>HLSL</Filter>
-    </None>
-    <None Include="Light.ps">
-      <Filter>HLSL</Filter>
-    </None>
-    <None Include="Light.vs">
-      <Filter>HLSL</Filter>
-    </None>
-    <None Include="Cube.txt">
-      <Filter>ModelFormat</Filter>
-    </None>
-    <None Include="light-T9.ps">
-      <Filter>HLSL</Filter>
-    </None>
   </ItemGroup>
 </Project>
