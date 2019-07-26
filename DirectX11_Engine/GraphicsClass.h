@@ -35,22 +35,30 @@ const bool FULL_SCREEN = false;//true;
 const bool VSYNC_ENABLED = true;//false;
 const float SCREEN_DEPTH = 1000.0f;
 const float SCREEN_NEAR = 0.1f;
-const int TUTORIALTYPE = 12;
+const int TUTORIALTYPE = 13;
 
 class CGraphicsClass
 {
 public:
+	struct SInputPosInfo
+	{
+		int nPosX;
+		int nPosY;
+
+		char * sBuffer;
+	};
+
+
 	CGraphicsClass(void);
 	CGraphicsClass(const CGraphicsClass&);
 	~CGraphicsClass(void);
 
 	bool Initialize(int, int, HWND);
 	void Shutdown();
-	bool Frame();
+	bool Frame(SInputPosInfo data);
 
 	// saemi
 	void GetCardInfo();
-	void SetMouseInfo(int nX, int nY);
 
 private:
 	bool Render();
@@ -83,12 +91,8 @@ private:
 	float AmbientColor[4];
 	float SpecularColor[4];	// 반사색
 	float SpecularPower;	// 반사강도
-	struct SMouseClickInfo
-	{
-		int nPosX;
-		int nPosY;
-	};
-	SMouseClickInfo m_MouseInfo;
+
+	SInputPosInfo m_pInputData;
 
 };
 

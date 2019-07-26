@@ -51,8 +51,6 @@ CGraphicsClass::CGraphicsClass(void)
 	SpecularColor[3] = 1.0f;
 	SpecularPower = 32.0f;
 
-	m_MouseInfo.nPosX = 0;
-	m_MouseInfo.nPosY = 0;
 }
 
 CGraphicsClass::CGraphicsClass(const CGraphicsClass& other)
@@ -225,7 +223,7 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 		if(!m_Bitmap->Initialize(m_D3D->GetDevice(), scW, scH, L"../DirectX11_Engine/data/wood.dds", 1200, 800))
 			return false;
 	}
-	else if(TUTORIALTYPE == 12)
+	else if(TUTORIALTYPE >= 12)
 	{
 		// set the initial position of the camera.
 		m_Camera->SetPosition(0, 0, -1);
@@ -238,9 +236,9 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 		if(!m_pText)
 			return false;
 
-		CText::ScreenSizeInfo info;
-		info.screenWidth = scW;
-		info.screenHeight = scH;
+		CText::TextPoint info;
+		info.sW = scW;
+		info.sH = scH;
 
 		if(!m_pText->Initialize(m_D3D->GetDevice(), m_D3D->GetDeviceContext(), hWnd, info, baseViewMatrix))
 			return false;
@@ -333,8 +331,12 @@ void CGraphicsClass::Shutdown()
 	return;
 }
 
-bool CGraphicsClass::Frame()
+bool CGraphicsClass::Frame(SInputPosInfo data)
 {
+	m_pInputData.nPosX = data.nPosX;
+	m_pInputData.nPosY = data.nPosY;
+	m_pInputData.sBuffer = data.sBuffer;
+
 	if(!Render())
 		return false;
 
@@ -452,19 +454,26 @@ bool CGraphicsClass::Render()
 		if(TUTORIALTYPE == 11)
 		{
 
-			if(!m_Bitmap->Render(m_D3D->GetDeviceContext(), m_MouseInfo.nPosX, m_MouseInfo.nPosY))
+			if(!m_Bitmap->Render(m_D3D->GetDeviceContext(), m_pInputData.nPosX, m_pInputData.nPosY))
 				return false;
 
 			if(!m_TextureShader->Render(m_D3D->GetDeviceContext(), m_Bitmap->GetIndexCount(), _worldMatrix, _viewMatrix, otherMatrix, m_Bitmap->GetTexture()))
 				return false;
 
 		}
-		else if(TUTORIALTYPE == 12)
+		else if(TUTORIALTYPE >= 12)
 		{
 			m_D3D->TurnOnAlphaBlending();
 
-			if(!m_pText->Render(m_D3D->GetDeviceContext(), _worldMatrix, _orthoMatrix))
-				return false;
+			// 마우스 포인터 연결 
+			m_pText->SetMousePosition(m_pInputData.nPosX, m_pInputData.nPosY, m_D3D->GetDeviceContext());
+
+
+			m_pText->SetKeyBoardInputData(m_D3D->GetDeviceContext(), m_pInputData.sBuffer);
+
+			m_pText->Render(m_D3D->GetDeviceContext(), _worldMatrix, _orthoMatrix);
+
+			m_Camera->SetPosition(0,0,-10);
 
 			m_D3D->TurnOffAlphaBlending();
 		}
@@ -495,9 +504,4 @@ void CGraphicsClass::GetCardInfo()
 		
 		OutputDebugStringA(logMessage);
 	}
-}
-void CGraphicsClass::SetMouseInfo(int nX, int nY)
-{
-	m_MouseInfo.nPosX = nX;
-	m_MouseInfo.nPosY = nY;
 }

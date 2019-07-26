@@ -25,7 +25,9 @@ bool CSystemClass::Initialize()
 	if(!m_pInput)
 		return false;
 
-	m_pInput->Initialize();
+	// T13 Direct Input
+	if(!m_pInput->Initialize(m_hinstance, m_hwnd, screenX, screenY))
+		return false;
 
 	m_pGraphics = new CGraphicsClass;
 	if(!m_pGraphics)
@@ -48,6 +50,7 @@ void CSystemClass::Shutdown()
 
 	if(m_pInput)
 	{
+		m_pInput->Shutdown();
 		delete m_pInput;
 		m_pInput = 0;
 	}
@@ -60,9 +63,8 @@ void CSystemClass::Shutdown()
 void CSystemClass::Run()
 {
 	MSG msg;
-	bool done;
+	bool done= false;
 	ZeroMemory(&msg, sizeof(MSG));
-	done = false;
 
 	while(!done)
 	{
@@ -81,52 +83,67 @@ void CSystemClass::Run()
 				done = true;
 			}
 		}
+
+		// Check if the user pressed escape and wants to quit.
+		if(m_pInput->IsEscapePressed())
+			done = true;
 	}
 	return;
 }
 
 bool CSystemClass::Frame()
 {
-	if(m_pInput->IsKeyDown(VK_ESCAPE))
+
+// 	if(m_pInput->IsKeyDown(VK_ESCAPE))
+// 		return false;
+// 
+// 	if(m_pInput->IsKeyDown(VK_RETURN))
+// 	{
+// 		m_pGraphics->GetCardInfo();
+// 		return true;
+// 	}
+
+	// T13
+	if(!m_pInput->Frame())
 		return false;
 
-	if(m_pInput->IsKeyDown(VK_RETURN))
-	{
-		m_pGraphics->GetCardInfo();
-		return true;
-	}
-
-	if(!m_pGraphics->Frame())
+	CGraphicsClass::SInputPosInfo info;
+	
+	m_pInput->GetMouseLocation(info.nPosX, info.nPosY);
+	info.sBuffer = m_pInput->GetKeyboardInputData();
+	
+	if(!m_pGraphics->Frame(info))
 		return false;
 
 	return true;
 }
 LRESULT CALLBACK CSystemClass::MessageHandler(HWND hwnd, UINT jumsg, WPARAM wparam, LPARAM lparam)
 {
-	switch (jumsg)
-	{
-	case WM_KEYDOWN:
-		{
-			if(m_pInput)
-				m_pInput->KeyDown((unsigned int)wparam);
-			return 0;
-		}
-	case WM_KEYUP:
-		{
-			if(m_pInput)
-				m_pInput->KeyUp((unsigned int)wparam);
-			return 0;
-		}
-	case WM_MOUSEMOVE:
-		{
-			if(m_pGraphics)
-				m_pGraphics->SetMouseInfo((int)LOWORD(lparam), (int)HIWORD(lparam));
+// 	switch (jumsg)
+// 	{
+// 	case WM_KEYDOWN:
+// 		{
+// 			if(m_pInput)
+// 				m_pInput->KeyDown((unsigned int)wparam);
+// 			return 0;
+// 		}
+// 	case WM_KEYUP:
+// 		{
+// 			if(m_pInput)
+// 				m_pInput->KeyUp((unsigned int)wparam);
+// 			return 0;
+// 		}
+// 	case WM_MOUSEMOVE:
+// 		{
+// 			
+// 
+// 			return 0;
+// 		}
+//	default:
+//		return DefWindowProc(hwnd, jumsg, wparam, lparam);
+//	}
 
-			return 0;
-		}
-	default:
-		return DefWindowProc(hwnd, jumsg, wparam, lparam);
-	}
+	return DefWindowProc(hwnd, jumsg, wparam, lparam);
 }
 
 void CSystemClass::InitializeWIndows(int& screenW, int& screenH)
@@ -193,7 +210,7 @@ void CSystemClass::InitializeWIndows(int& screenW, int& screenH)
 	SetForegroundWindow(m_hwnd);
 	SetFocus(m_hwnd);
 
-	ShowCursor(false);
+	ShowCursor(true);
 
 	return;
 

@@ -10,6 +10,16 @@ CText::CText(void)
 	for(int i=0; i<nC; i++)
 		m_sentence[i] = 0;
 
+	m_MouseMoveSetence = 0;
+	m_KeyboadSetence = 0;
+
+	ZeroMemory(&m_sKeyBoardInputData, sizeof(m_sKeyBoardInputData));
+
+	strcpy(m_sKeyBoardInputData, "Input : ");
+
+	m_nKeyBoardStart.sX = 50;
+	m_nKeyBoardStart.sY = 50;
+
 }
 CText::CText(const CText& other)
 {
@@ -19,10 +29,10 @@ CText::~CText(void)
 {
 }
 
-bool CText::Initialize(ID3D11Device * _device, ID3D11DeviceContext * _devContext, HWND _hWnd, ScreenSizeInfo _screenSize, D3DXMATRIX _baseViewMatrix)
+bool CText::Initialize(ID3D11Device * _device, ID3D11DeviceContext * _devContext, HWND _hWnd, TextPoint _screenWH, D3DXMATRIX _baseViewMatrix)
 {
-	m_nScreenSize.screenWidth = _screenSize.screenWidth;
-	m_nScreenSize.screenHeight = _screenSize.screenHeight;
+	m_nScreenWH.sW = _screenWH.sW;
+	m_nScreenWH.sH = _screenWH.sH;
 	m_baseViewMatrix = _baseViewMatrix;
 
 	m_pFont = new CFontClass;
@@ -58,12 +68,21 @@ bool CText::Initialize(ID3D11Device * _device, ID3D11DeviceContext * _devContext
 		if(!UpdateSentence(m_sentence[i], strList[i], 50, 100 + ( i * 20 ), fColor, _devContext ))
 			return false;
 	}
+	
+	if(!InitializeSentence(&m_MouseMoveSetence, 50, _device))
+		return false;
+
+	if(!InitializeSentence(&m_KeyboadSetence, 256, _device))
+		return false;
 
 	return true;
 }
 
 void CText::Shutdown()
 {
+	ReleaseSentence(&m_KeyboadSetence);
+	ReleaseSentence(&m_MouseMoveSetence);
+
 	int nC = sizeof(m_sentence) / sizeof(m_sentence[0]);
 	for(int i=0; i<nC; i++)
 		ReleaseSentence(&m_sentence[i]);
@@ -87,6 +106,12 @@ bool CText::Render(ID3D11DeviceContext * _devContext, D3DXMATRIX _worldMatrix, D
 	for(int i=0; i<nC; i++)
 		if(!RenderSetence(_devContext, m_sentence[i], _worldMatrix, _orthoMatrix))
 			return false;
+
+	if(!RenderSetence(_devContext, m_MouseMoveSetence, _worldMatrix, _orthoMatrix))
+		return false;
+
+	if(!RenderSetence(_devContext, m_KeyboadSetence, _worldMatrix, _orthoMatrix))
+		return false;
 
 	return true;
 }
@@ -178,8 +203,8 @@ bool CText::UpdateSentence(SentenceType* _sentence, char* _strText, int _posX, i
 
 	memset(vertices, 0, (sizeof(VertexType) * _sentence->nVertCount));
 
-	float drawX = (float)(((m_nScreenSize.screenWidth / 2) * -1) + _posX);
-	float drawY = (float)((m_nScreenSize.screenHeight / 2) - _posY);
+	float drawX = (float)(((m_nScreenWH.sW / 2) * -1) + _posX);
+	float drawY = (float)((m_nScreenWH.sH / 2) - _posY);
 	
 	m_pFont->BuildVertexArray((void*)vertices, _strText, drawX, drawY);
 
@@ -233,6 +258,43 @@ bool CText::RenderSetence(ID3D11DeviceContext* _devContext, SentenceType * _sent
 	D3DXVECTOR4 pixelColor = D3DXVECTOR4(_sentence->nfRed, _sentence->nfGreen, _sentence->nfBlue, 1.0f);
 
 	if(!m_pFontShader->Render(_devContext, _sentence->nIdxCount, _worldMatrix, m_baseViewMatrix, _orthoMatrix, m_pFont->GetTexture(), pixelColor))
+		return false;
+
+	return true;
+}
+
+bool CText::SetMousePosition(int posX, int posY, ID3D11DeviceContext* devContext)
+{
+	char strMsg[50];
+
+	sprintf(strMsg, "Mouse (%d, %d)", posX, posY);
+
+	FontColor fColor;
+	fColor.red = 1.0f;
+	fColor.green = 1.0f;
+	fColor.blue = 1.0f;
+
+	if(!UpdateSentence(m_MouseMoveSetence, strMsg, posX, posY, fColor, devContext))
+		return false;
+
+	return true;
+}
+
+bool CText::SetKeyBoardInputData(ID3D11DeviceContext* devContext, char * data)
+{
+	if(data == NULL)
+		return false;
+
+	char strMsg[256];
+
+	strcpy(strMsg, data);
+
+	FontColor fColor;
+	fColor.red = 1.0f;
+	fColor.green = 1.0f;
+	fColor.blue = 1.0f;
+
+	if(!UpdateSentence(m_MouseMoveSetence, strMsg, m_nKeyBoardStart.sX, m_nKeyBoardStart.sY, fColor, devContext))
 		return false;
 
 	return true;

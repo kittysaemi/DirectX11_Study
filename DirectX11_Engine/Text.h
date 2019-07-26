@@ -31,10 +31,12 @@ private:
 	};
 
 public:
-	struct ScreenSizeInfo
+	struct TextPoint
 	{
-		int screenWidth;
-		int screenHeight;
+		int sX;
+		int sY;
+		int sW;
+		int sH;
 	};
 	struct FontColor
 	{
@@ -48,9 +50,12 @@ public:
 	CText(const CText& other);
 	~CText(void);
 
-	bool Initialize(ID3D11Device * _device, ID3D11DeviceContext * _devContext, HWND _hWnd, ScreenSizeInfo _screenSize, D3DXMATRIX _baseViewMatrix);
+	bool Initialize(ID3D11Device * _device, ID3D11DeviceContext * _devContext, HWND _hWnd, TextPoint _screenWH, D3DXMATRIX _baseViewMatrix);
 	void Shutdown();
 	bool Render(ID3D11DeviceContext * _devContext, D3DXMATRIX _worldMatrix, D3DXMATRIX _orthoMatrix);
+
+	bool SetMousePosition(int posX, int posY, ID3D11DeviceContext* devContext);
+	bool SetKeyBoardInputData(ID3D11DeviceContext* devContext, char * data);
 
 private:
 	bool InitializeSentence(SentenceType** _sentenceData, int _maxLen, ID3D11Device* _device);
@@ -60,9 +65,15 @@ private:
 
 	CFontClass * m_pFont;
 	CFontShader * m_pFontShader;
-	ScreenSizeInfo m_nScreenSize;
+	TextPoint m_nScreenWH;
 	D3DXMATRIX m_baseViewMatrix;
 	SentenceType * m_sentence[10];
+
+	SentenceType * m_MouseMoveSetence;
+
+	TextPoint m_nKeyBoardStart;
+	SentenceType * m_KeyboadSetence;
+	char m_sKeyBoardInputData[256];
 };
 
 #endif
