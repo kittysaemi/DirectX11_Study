@@ -98,32 +98,15 @@ void CSystemClass::Run()
 				done = true;
 			}
 		}
-
-		// Check if the user pressed escape and wants to quit.
-		if(m_pInput->IsEscapePressed())
-			done = true;
-
-		if(m_pInput->IsPlayStatus(DIK_F1))	// Play
-		{
-			m_pSound->PlayWaveFile();
-		}
-		if(m_pInput->IsPlayStatus(DIK_F2))	// Pause
-		{
-			m_pSound->PauseWaveFIle();
-		}
-		if(m_pInput->IsPlayStatus(DIK_F3))	// Stop
-		{
-			m_pSound->StopWaveFile();
-		}
-
-		m_pGraphics->SetPlayStatus(m_pSound->GetPlayStatus());
-
 	}
 	return;
 }
 
 bool CSystemClass::Frame()
 {
+	// Check if the user pressed escape and wants to quit.
+	if(m_pInput->IsEscapePressed())
+		return false;
 
 // 	if(m_pInput->IsKeyDown(VK_ESCAPE))
 // 		return false;
@@ -133,6 +116,22 @@ bool CSystemClass::Frame()
 // 		m_pGraphics->GetCardInfo();
 // 		return true;
 // 	}
+
+	// Sound
+	if(m_pInput->IsPlayStatus(DIK_F1))	// Play
+	{
+		m_pSound->PlayWaveFile();
+	}
+	if(m_pInput->IsPlayStatus(DIK_F2))	// Pause
+	{
+		m_pSound->PauseWaveFIle();
+	}
+	if(m_pInput->IsPlayStatus(DIK_F3))	// Stop
+	{
+		m_pSound->StopWaveFile();
+	}
+
+	m_pGraphics->SetPlayStatus(m_pSound->GetPlayStatus());
 
 	// T13
 	if(!m_pInput->Frame())
@@ -145,6 +144,8 @@ bool CSystemClass::Frame()
 	
 	if(!m_pGraphics->Frame(info))
 		return false;
+
+
 
 
 	return true;
