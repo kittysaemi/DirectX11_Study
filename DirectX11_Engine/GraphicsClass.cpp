@@ -51,6 +51,8 @@ CGraphicsClass::CGraphicsClass(void)
 	SpecularColor[3] = 1.0f;
 	SpecularPower = 32.0f;
 
+	ZeroMemory(m_sSoundStatusMsg, sizeof(m_sSoundStatusMsg));
+
 }
 
 CGraphicsClass::CGraphicsClass(const CGraphicsClass& other)
@@ -465,13 +467,19 @@ bool CGraphicsClass::Render()
 		{
 			m_D3D->TurnOnAlphaBlending();
 
+			// Sound 
+			m_pText->SetPlayStatusMsg(m_D3D->GetDeviceContext(), m_sSoundStatusMsg);
+
 			// 마우스 포인터 연결 
 			m_pText->SetMousePosition(m_pInputData.nPosX, m_pInputData.nPosY, m_D3D->GetDeviceContext());
-
-
+			
 			m_pText->SetKeyBoardInputData(m_D3D->GetDeviceContext(), m_pInputData.sBuffer);
 
 			m_pText->Render(m_D3D->GetDeviceContext(), _worldMatrix, _orthoMatrix);
+
+			
+
+
 
 			m_Camera->SetPosition(0,0,-10);
 
@@ -504,4 +512,9 @@ void CGraphicsClass::GetCardInfo()
 		
 		OutputDebugStringA(logMessage);
 	}
+}
+
+void CGraphicsClass::SetPlayStatus(char * _Msg)
+{
+	strcpy(m_sSoundStatusMsg, _Msg);
 }

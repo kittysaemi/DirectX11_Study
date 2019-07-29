@@ -206,6 +206,12 @@ bool CInputClass::IsEscapePressed()
 	return false;
 }
 
+bool CInputClass::IsPlayStatus(UINT _type)
+{
+	if(m_cKeyState[_type] & 0x80)
+		return true;
+	return false;
+}
 
 
 void CInputClass::GetMouseLocation(int &posX, int &posY)

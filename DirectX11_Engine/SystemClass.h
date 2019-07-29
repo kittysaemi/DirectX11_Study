@@ -3,6 +3,14 @@
 //////////////////////////////////////////////////////////////////////////
 // tutorial 2
 
+//////////////////////////////////////////////////////////////////////////
+// tutorial 13
+// DirectInput 추가
+
+//////////////////////////////////////////////////////////////////////////
+// tutorial 14
+// DirectSound 추가
+
 #ifndef _SYSTEMCLASS_H_
 #define _SYSTEMCLASS_H_
 
@@ -12,6 +20,7 @@
 
 #include "GraphicsClass.h"
 #include "InputClass.h"
+#include "SoundClass.h"
 
 class CSystemClass
 {
@@ -37,6 +46,7 @@ private:
 	
 	CInputClass * m_pInput;
 	CGraphicsClass * m_pGraphics;
+	CSoundClass * m_pSound;
 
 };
 

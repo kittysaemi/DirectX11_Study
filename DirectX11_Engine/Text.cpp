@@ -20,6 +20,8 @@ CText::CText(void)
 	m_nKeyBoardStart.sX = 50;
 	m_nKeyBoardStart.sY = 50;
 
+	m_SoundSetence = 0;
+
 }
 CText::CText(const CText& other)
 {
@@ -75,6 +77,19 @@ bool CText::Initialize(ID3D11Device * _device, ID3D11DeviceContext * _devContext
 	if(!InitializeSentence(&m_KeyboadSetence, 256, _device))
 		return false;
 
+	if(!InitializeSentence(&m_SoundSetence, 256, _device))
+		return false;
+
+	m_PlayStatusFontColor.red = 1;
+	m_PlayStatusFontColor.green =1;
+	m_PlayStatusFontColor.blue = 1;
+
+	m_nPlayStatusFontPoint.sX = 50;
+	m_nPlayStatusFontPoint.sY = m_nScreenWH.sH - 50;
+		
+	if(!UpdateSentence(m_SoundSetence, "Play Status : ",  m_nPlayStatusFontPoint.sX , m_nPlayStatusFontPoint.sY , m_PlayStatusFontColor, _devContext))
+		return false;
+
 	return true;
 }
 
@@ -82,6 +97,7 @@ void CText::Shutdown()
 {
 	ReleaseSentence(&m_KeyboadSetence);
 	ReleaseSentence(&m_MouseMoveSetence);
+	ReleaseSentence(&m_SoundSetence);
 
 	int nC = sizeof(m_sentence) / sizeof(m_sentence[0]);
 	for(int i=0; i<nC; i++)
@@ -111,6 +127,9 @@ bool CText::Render(ID3D11DeviceContext * _devContext, D3DXMATRIX _worldMatrix, D
 		return false;
 
 	if(!RenderSetence(_devContext, m_KeyboadSetence, _worldMatrix, _orthoMatrix))
+		return false;
+
+	if(!RenderSetence(_devContext, m_SoundSetence, _worldMatrix, _orthoMatrix))
 		return false;
 
 	return true;
@@ -298,4 +317,19 @@ bool CText::SetKeyBoardInputData(ID3D11DeviceContext* devContext, char * data)
 		return false;
 
 	return true;
+}
+
+bool CText::SetPlayStatusMsg(ID3D11DeviceContext* devContext, char * data)
+{
+	if(data == NULL)
+		return false;
+
+	char sSoundMsg[256];
+
+	ZeroMemory(sSoundMsg, sizeof(sSoundMsg));
+
+	sprintf(sSoundMsg, "Play Status : %s", data);
+
+	if(!UpdateSentence(m_SoundSetence, sSoundMsg,  m_nPlayStatusFontPoint.sX , m_nPlayStatusFontPoint.sY , m_PlayStatusFontColor, devContext))
+		return false;
 }

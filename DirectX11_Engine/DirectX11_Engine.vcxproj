@@ -89,6 +89,7 @@
     <ClCompile Include="LightshaderClass.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ModelClass.cpp" />
+    <ClCompile Include="SoundClass.cpp" />
     <ClCompile Include="SystemClass.cpp" />
     <ClCompile Include="Text.cpp" />
     <ClCompile Include="TextureClass.cpp" />
@@ -106,6 +107,7 @@
     <ClInclude Include="LightClass.h" />
     <ClInclude Include="LightshaderClass.h" />
     <ClInclude Include="ModelClass.h" />
+    <ClInclude Include="SoundClass.h" />
     <ClInclude Include="SystemClass.h" />
     <ClInclude Include="Text.h" />
     <ClInclude Include="TextureClass.h" />

@@ -59,6 +59,7 @@ public:
 
 	// saemi
 	void GetCardInfo();
+	void SetPlayStatus(char * _Msg);
 
 private:
 	bool Render();
@@ -93,6 +94,8 @@ private:
 	float SpecularPower;	// 반사강도
 
 	SInputPosInfo m_pInputData;
+
+	char m_sSoundStatusMsg[256];
 
 };
 

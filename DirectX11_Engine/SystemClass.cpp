@@ -5,6 +5,7 @@ CSystemClass::CSystemClass(void)
 {
 	m_pGraphics = 0;
 	m_pInput = 0;
+	m_pSound = 0;
 }
 
 CSystemClass::CSystemClass(const CSystemClass& other)
@@ -36,11 +37,25 @@ bool CSystemClass::Initialize()
 	if(!m_pGraphics->Initialize(screenX, screenY, m_hwnd))
 		return false;
 
+	m_pSound = new CSoundClass;
+	if(!m_pSound)
+		return false;
+
+	if(!m_pSound->Initialize(m_hwnd))
+		return false;
+
 	return true;
 }
 
 void CSystemClass::Shutdown()
 {
+	if(m_pSound)
+	{
+		m_pSound->Shutdown();
+		delete m_pSound;
+		m_pSound = 0;
+	}
+
 	if(m_pGraphics)
 	{
 		m_pGraphics->Shutdown();
@@ -87,6 +102,22 @@ void CSystemClass::Run()
 		// Check if the user pressed escape and wants to quit.
 		if(m_pInput->IsEscapePressed())
 			done = true;
+
+		if(m_pInput->IsPlayStatus(DIK_F1))	// Play
+		{
+			m_pSound->PlayWaveFile();
+		}
+		if(m_pInput->IsPlayStatus(DIK_F2))	// Pause
+		{
+			m_pSound->PauseWaveFIle();
+		}
+		if(m_pInput->IsPlayStatus(DIK_F3))	// Stop
+		{
+			m_pSound->StopWaveFile();
+		}
+
+		m_pGraphics->SetPlayStatus(m_pSound->GetPlayStatus());
+
 	}
 	return;
 }
@@ -114,6 +145,7 @@ bool CSystemClass::Frame()
 	
 	if(!m_pGraphics->Frame(info))
 		return false;
+
 
 	return true;
 }

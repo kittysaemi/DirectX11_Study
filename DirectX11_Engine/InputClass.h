@@ -40,6 +40,9 @@ public:
 	void GetMouseLocation(int &posX, int &posY);
 	char* GetKeyboardInputData();
 
+	// Sound
+	bool IsPlayStatus(UINT _type);
+
 
 private:
 	bool ReadKeyboard();
