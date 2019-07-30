@@ -42,10 +42,31 @@ class CGraphicsClass
 public:
 	struct SInputPosInfo
 	{
+		SInputPosInfo()
+		{
+			nPosX = nPosY = nCPUper = nFPS = 0;
+			nCurTime = 0;
+		}
+		SInputPosInfo(const SInputPosInfo& data)
+		{
+			nPosX = data.nPosX;
+			nPosY = data.nPosY;
+
+			sBuffer = data.sBuffer;
+
+			nCurTime = data.nCurTime;
+			nCPUper = data.nCPUper;
+			nFPS = data.nFPS;
+		}
+
 		int nPosX;
 		int nPosY;
 
 		char * sBuffer;
+
+		float nCurTime;
+		int nCPUper;
+		int nFPS;
 	};
 
 

@@ -11,6 +11,10 @@
 // tutorial 14
 // DirectSound Ãß°¡
 
+//////////////////////////////////////////////////////////////////////////
+// tutorial 15
+// fps, timer, cpu
+
 #ifndef _SYSTEMCLASS_H_
 #define _SYSTEMCLASS_H_
 
@@ -21,6 +25,9 @@
 #include "GraphicsClass.h"
 #include "InputClass.h"
 #include "SoundClass.h"
+#include "Fps.h"
+#include "Cpu.h"
+#include "Timer.h"
 
 class CSystemClass
 {
@@ -47,6 +54,10 @@ private:
 	CInputClass * m_pInput;
 	CGraphicsClass * m_pGraphics;
 	CSoundClass * m_pSound;
+
+	CFps * m_pFps;
+	CCpu * m_pCpu;
+	CTimer * m_pTimer;
 
 };
 

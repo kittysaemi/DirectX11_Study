@@ -80,9 +80,11 @@
     <ClCompile Include="BitmapClass.cpp" />
     <ClCompile Include="CameraClass.cpp" />
     <ClCompile Include="ColorShaderClass.cpp" />
+    <ClCompile Include="Cpu.cpp" />
     <ClCompile Include="D3DClass.cpp" />
     <ClCompile Include="FontClass.cpp" />
     <ClCompile Include="FontShader.cpp" />
+    <ClCompile Include="Fps.cpp" />
     <ClCompile Include="GraphicsClass.cpp" />
     <ClCompile Include="InputClass.cpp" />
     <ClCompile Include="LightClass.cpp" />
@@ -94,14 +96,17 @@
     <ClCompile Include="Text.cpp" />
     <ClCompile Include="TextureClass.cpp" />
     <ClCompile Include="Textureshaderclass.cpp" />
+    <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BitmapClass.h" />
     <ClInclude Include="CameraClass.h" />
     <ClInclude Include="ColorShaderClass.h" />
+    <ClInclude Include="Cpu.h" />
     <ClInclude Include="D3DClass.h" />
     <ClInclude Include="FontClass.h" />
     <ClInclude Include="FontShader.h" />
+    <ClInclude Include="Fps.h" />
     <ClInclude Include="GraphicsClass.h" />
     <ClInclude Include="InputClass.h" />
     <ClInclude Include="LightClass.h" />
@@ -112,6 +117,7 @@
     <ClInclude Include="Text.h" />
     <ClInclude Include="TextureClass.h" />
     <ClInclude Include="Textureshaderclass.h" />
+    <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Tutorial_Guid_Explan.txt" />

@@ -335,9 +335,7 @@ void CGraphicsClass::Shutdown()
 
 bool CGraphicsClass::Frame(SInputPosInfo data)
 {
-	m_pInputData.nPosX = data.nPosX;
-	m_pInputData.nPosY = data.nPosY;
-	m_pInputData.sBuffer = data.sBuffer;
+	m_pInputData = data;
 
 	if(!Render())
 		return false;
@@ -467,6 +465,11 @@ bool CGraphicsClass::Render()
 		{
 			m_D3D->TurnOnAlphaBlending();
 
+			// FPS, timer, CPU
+			m_pText->SetTimer(m_D3D->GetDeviceContext(), m_pInputData.nCurTime, 0);
+			m_pText->SetFps(m_D3D->GetDeviceContext(), m_pInputData.nFPS, 1);
+			m_pText->SetCPUpersentage(m_D3D->GetDeviceContext(), m_pInputData.nCPUper, 2);
+
 			// Sound 
 			m_pText->SetPlayStatusMsg(m_D3D->GetDeviceContext(), m_sSoundStatusMsg);
 
@@ -476,9 +479,6 @@ bool CGraphicsClass::Render()
 			m_pText->SetKeyBoardInputData(m_D3D->GetDeviceContext(), m_pInputData.sBuffer);
 
 			m_pText->Render(m_D3D->GetDeviceContext(), _worldMatrix, _orthoMatrix);
-
-			
-
 
 
 			m_Camera->SetPosition(0,0,-10);

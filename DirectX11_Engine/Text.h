@@ -57,6 +57,9 @@ public:
 	bool SetMousePosition(int posX, int posY, ID3D11DeviceContext* devContext);
 	bool SetKeyBoardInputData(ID3D11DeviceContext* devContext, char * data);
 	bool SetPlayStatusMsg(ID3D11DeviceContext* devContext, char * data);
+	bool SetCPUpersentage(ID3D11DeviceContext * devContext, int cpu, int idx);
+	bool SetFps(ID3D11DeviceContext * devContext, int fps, int idx);
+	bool SetTimer(ID3D11DeviceContext * devContext, float TIme, int idx);
 
 private:
 	bool InitializeSentence(SentenceType** _sentenceData, int _maxLen, ID3D11Device* _device);
@@ -80,6 +83,11 @@ private:
 	TextPoint m_nPlayStatusFontPoint;
 	FontColor	m_PlayStatusFontColor;
 	SentenceType * m_SoundSetence;
+
+	TextPoint m_ComPoint[3];
+	FontColor m_ComColor[3];
+	SentenceType * m_ComInfo[3];
+
 };
 
 #endif

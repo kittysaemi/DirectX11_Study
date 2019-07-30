@@ -6,6 +6,10 @@ CSystemClass::CSystemClass(void)
 	m_pGraphics = 0;
 	m_pInput = 0;
 	m_pSound = 0;
+
+	m_pCpu = 0;
+	m_pFps = 0;
+	m_pTimer = 0;
 }
 
 CSystemClass::CSystemClass(const CSystemClass& other)
@@ -44,11 +48,45 @@ bool CSystemClass::Initialize()
 	if(!m_pSound->Initialize(m_hwnd))
 		return false;
 
+	m_pFps = new CFps;
+	if(!m_pFps)
+		return false;
+	m_pFps->Initialize();
+
+	m_pCpu = new CCpu;
+	if(!m_pCpu)
+		return false;
+	m_pCpu->Initialize();
+
+	m_pTimer = new CTimer;
+	if(!m_pTimer)
+		return false;
+	m_pTimer->Initialize();
+
 	return true;
 }
 
 void CSystemClass::Shutdown()
 {
+	if(m_pTimer)
+	{
+		delete m_pTimer;
+		m_pTimer = 0;
+	}
+
+	if(m_pCpu)
+	{
+		m_pCpu->Shutdown();
+		delete m_pCpu;
+		m_pCpu = 0;
+	}
+
+	if(m_pFps)
+	{
+		delete m_pFps;
+		m_pFps = 0;
+	}
+
 	if(m_pSound)
 	{
 		m_pSound->Shutdown();
@@ -108,14 +146,16 @@ bool CSystemClass::Frame()
 	if(m_pInput->IsEscapePressed())
 		return false;
 
-// 	if(m_pInput->IsKeyDown(VK_ESCAPE))
-// 		return false;
-// 
-// 	if(m_pInput->IsKeyDown(VK_RETURN))
-// 	{
-// 		m_pGraphics->GetCardInfo();
-// 		return true;
-// 	}
+	// cpu, timer, fps
+	m_pTimer->Frame();
+	m_pFps->Frame();
+	m_pCpu->Frame();
+
+	CGraphicsClass::SInputPosInfo info;
+	info.nCPUper = m_pCpu->GetCpuPercentage();
+	info.nCurTime = m_pTimer->GetTIme();
+	info.nFPS = m_pFps->GetFps();
+
 
 	// Sound
 	if(m_pInput->IsPlayStatus(DIK_F1))	// Play
@@ -136,9 +176,8 @@ bool CSystemClass::Frame()
 	// T13
 	if(!m_pInput->Frame())
 		return false;
-
-	CGraphicsClass::SInputPosInfo info;
 	
+	// DirectInput Info
 	m_pInput->GetMouseLocation(info.nPosX, info.nPosY);
 	info.sBuffer = m_pInput->GetKeyboardInputData();
 	

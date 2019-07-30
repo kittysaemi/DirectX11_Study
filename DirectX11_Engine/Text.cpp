@@ -22,6 +22,10 @@ CText::CText(void)
 
 	m_SoundSetence = 0;
 
+	nC = sizeof(m_ComInfo) / sizeof(m_ComInfo[0]);
+	for(int i=0; i<nC; i++)
+		m_ComInfo[i] = 0;
+
 }
 CText::CText(const CText& other)
 {
@@ -90,6 +94,16 @@ bool CText::Initialize(ID3D11Device * _device, ID3D11DeviceContext * _devContext
 	if(!UpdateSentence(m_SoundSetence, "Play Status : ",  m_nPlayStatusFontPoint.sX , m_nPlayStatusFontPoint.sY , m_PlayStatusFontColor, _devContext))
 		return false;
 
+	nC = sizeof(m_ComInfo) / sizeof(m_ComInfo[0]);
+	for(int i=0; i<nC; i++)
+	{
+		if(!InitializeSentence(&m_ComInfo[i], 256, _device))
+			return false;
+
+		m_ComPoint[i].sX = m_nScreenWH.sW - 100;
+		m_ComPoint[i].sY = 50 + ( i * 50 );
+	}
+
 	return true;
 }
 
@@ -99,9 +113,16 @@ void CText::Shutdown()
 	ReleaseSentence(&m_MouseMoveSetence);
 	ReleaseSentence(&m_SoundSetence);
 
+
 	int nC = sizeof(m_sentence) / sizeof(m_sentence[0]);
 	for(int i=0; i<nC; i++)
 		ReleaseSentence(&m_sentence[i]);
+
+	 nC = sizeof(m_ComInfo) / sizeof(m_ComInfo[0]);
+	for(int i=0; i<nC; i++)
+	{
+		ReleaseSentence(&m_ComInfo[i]);
+	}
 
 	if(m_pFontShader)
 	{
@@ -131,6 +152,11 @@ bool CText::Render(ID3D11DeviceContext * _devContext, D3DXMATRIX _worldMatrix, D
 
 	if(!RenderSetence(_devContext, m_SoundSetence, _worldMatrix, _orthoMatrix))
 		return false;
+
+	 nC = sizeof(m_ComInfo) / sizeof(m_ComInfo[0]);
+	 for(int i=0; i<nC; i++)
+		if(!RenderSetence(_devContext, m_ComInfo[i], _worldMatrix, _orthoMatrix))
+			return false;
 
 	return true;
 }
@@ -332,4 +358,78 @@ bool CText::SetPlayStatusMsg(ID3D11DeviceContext* devContext, char * data)
 
 	if(!UpdateSentence(m_SoundSetence, sSoundMsg,  m_nPlayStatusFontPoint.sX , m_nPlayStatusFontPoint.sY , m_PlayStatusFontColor, devContext))
 		return false;
+}
+
+bool CText::SetCPUpersentage(ID3D11DeviceContext * devContext, int cpu, int idx)
+{
+	char tempStr[16];
+	_itoa_s(cpu, tempStr, 10);
+
+	char cpuStr[16];
+	strcpy_s(cpuStr, "Cpu: ");
+	strcat_s(cpuStr, tempStr);
+	strcat_s(cpuStr, "%");
+
+	m_ComColor[idx].red = 1.0f;
+	m_ComColor[idx].green = 1.0f;
+	m_ComColor[idx].blue = 0.0f;
+	
+	if(!UpdateSentence(m_ComInfo[idx], cpuStr, m_ComPoint[idx].sX, m_ComPoint[idx].sY, m_ComColor[idx], devContext))
+		return false;
+
+	return true;
+}
+bool CText::SetFps(ID3D11DeviceContext * devContext, int fps, int idx)
+{
+	if(fps > 9999)
+		fps = 9999;
+
+	char tempStr[16];
+	_itoa_s(fps, tempStr, 10);
+
+	char fpsStr[16];
+	strcpy_s(fpsStr, "Fps : ");
+	strcat_s(fpsStr, tempStr);
+
+	if(fps >= 60)
+	{
+		m_ComColor[idx].red = 0.0f;
+		m_ComColor[idx].green = 1.0f;
+		m_ComColor[idx].blue = 0.0f;
+	}
+	if(fps < 60)
+	{
+		m_ComColor[idx].red = 1.0f;
+		m_ComColor[idx].green = 1.0f;
+		m_ComColor[idx].blue = 0.0f;
+	}
+	if(fps < 30)
+	{
+		m_ComColor[idx].red = 1.0f;
+		m_ComColor[idx].green = 0.0f;
+		m_ComColor[idx].blue = 0.0f;
+	}
+
+	if(!UpdateSentence(m_ComInfo[idx], fpsStr, m_ComPoint[idx].sX, m_ComPoint[idx].sY, m_ComColor[idx], devContext))
+		return false;
+
+	return true;
+}
+bool CText::SetTimer(ID3D11DeviceContext * devContext, float TIme, int idx)
+{
+	char tempStr[16];
+	_itoa_s(TIme, tempStr, 10);
+
+	char FrameStr[16];
+	strcpy_s(FrameStr, "FrameTime : ");
+	strcat_s(FrameStr, tempStr);
+
+	m_ComColor[idx].red = 1.0f;
+	m_ComColor[idx].green = 1.0f;
+	m_ComColor[idx].blue = 0.0f;
+
+	if(!UpdateSentence(m_ComInfo[idx], FrameStr, m_ComPoint[idx].sX, m_ComPoint[idx].sY, m_ComColor[idx], devContext))
+		return false;
+
+	return true;
 }
