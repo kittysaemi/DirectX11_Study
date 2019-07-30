@@ -19,7 +19,7 @@ public:
 	~CPosition(void);
 
 	void SetFrameTIme(float time);
-	void GetRotation(float& x, float& y);
+	void GetRotation(float& x, float& y, float& z);
 
 	void TurnLeft(bool keydown);
 	void TurnRight(bool keydown);
@@ -27,14 +27,21 @@ public:
 	void TurnTop(bool keydown);
 	void TurnBottom(bool keydown);
 
+	void ZoomIn(bool keydown); // 확대
+	void ZoomOut(bool keydown); // 축소
+
 private:
 	float m_nfFrameTIme;
 	float m_nfRotationX;
 	float m_nfRotationY;
+	float m_nfRotationZ;
 	float m_nfLeftTurnSpeed;
 	float m_nfRightTurnSpeed;
 	float m_nfTopTurnSpeed;
 	float m_nfBottomTurnSpeed;
+	float m_nfZoomInSpeed;
+	float m_nfZoomOutSpeed;
+	
 };
 
 #endif

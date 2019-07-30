@@ -201,8 +201,10 @@ bool CSystemClass::Frame()
 	m_pPosition->TurnRight(m_pInput->IsRightArrowPressed());
 	m_pPosition->TurnTop(m_pInput->IsTopArrowPressed());
 	m_pPosition->TurnBottom(m_pInput->IsBottomArrowPressed());
+	m_pPosition->ZoomIn(m_pInput->IsCtrlDown());
+	m_pPosition->ZoomOut(m_pInput->IsCtrlUp());
 
-	m_pPosition->GetRotation(info.nRotationX, info.nRotationY);
+	m_pPosition->GetRotation(info.nRotationX, info.nRotationY, info.nRotationZ);
 
 	
 	// GUI 

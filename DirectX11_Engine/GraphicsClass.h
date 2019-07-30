@@ -51,6 +51,7 @@ public:
 		{
 			nPosX = nPosY = nCPUper = nFPS = 0;
 			nCurTime = nRotationY = nRotationX = 0.0f;
+			nRotationZ = -10.0f;
 		}
 		SInputPosInfo(const SInputPosInfo& data)
 		{
@@ -58,6 +59,7 @@ public:
 			nPosY = data.nPosY;
 			nRotationY = data.nRotationY;
 			nRotationX = data.nRotationX;
+			nRotationZ = data.nRotationZ;
 
 			sBuffer = data.sBuffer;
 
@@ -70,6 +72,7 @@ public:
 		int nPosY;
 		float nRotationY;
 		float nRotationX;
+		float nRotationZ;
 
 		char * sBuffer;
 

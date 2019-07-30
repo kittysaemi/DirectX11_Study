@@ -36,6 +36,9 @@ public:
 	void Shutdown();
 	bool Frame();
 
+
+	bool IsCtrlUp();
+	bool IsCtrlDown();
 	bool IsTopArrowPressed();
 	bool IsBottomArrowPressed();
 	bool IsRightArrowPressed();

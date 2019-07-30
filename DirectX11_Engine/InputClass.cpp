@@ -229,6 +229,19 @@ bool CInputClass::IsBottomArrowPressed()
 		return true;
 	return false;
 }
+bool CInputClass::IsCtrlUp()
+{
+	if(m_cKeyState[DIK_ADD] & 0x80)
+		return true;
+	return false;
+}
+
+bool CInputClass::IsCtrlDown()
+{
+	if(m_cKeyState[DIK_SUBTRACT] & 0x80)
+		return true;
+	return false;
+}
 
 bool CInputClass::IsPlayStatus(UINT _type)
 {

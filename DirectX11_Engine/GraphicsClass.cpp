@@ -411,7 +411,7 @@ bool CGraphicsClass::Frame(SInputPosInfo data)
 
 	if(TUTORIALTYPE >= 16)
 	{
-		m_Camera->SetPosition(0.0f, 0.0f, -10.0f);
+		m_Camera->SetPosition(0.0f, 0.0f, m_pInputData.nRotationZ);
 		m_Camera->SetRotation(m_pInputData.nRotationX, m_pInputData.nRotationY, 0.0f);
 	}
 

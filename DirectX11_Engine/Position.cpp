@@ -6,6 +6,7 @@ CPosition::CPosition(void)
 	m_nfFrameTIme = 0.0f;
 	m_nfRotationX = 0.0f;
 	m_nfRotationY = 0.0f;
+	m_nfRotationZ = 0.0f;
 	m_nfLeftTurnSpeed = 0.0f;
 	m_nfRightTurnSpeed = 0.0f;
 	m_nfTopTurnSpeed = 0.0f;
@@ -26,10 +27,11 @@ void CPosition::SetFrameTIme(float time)
 	m_nfFrameTIme = time;
 }
 
-void CPosition::GetRotation(float& x, float& y)
+void CPosition::GetRotation(float& x, float& y, float& z)
 {
 	x = m_nfRotationX;
 	y = m_nfRotationY;
+	z = m_nfRotationZ;
 }
 
 void CPosition::TurnLeft(bool keydown)
@@ -125,4 +127,18 @@ void CPosition::TurnBottom(bool keydown)
 	m_nfRotationX -= m_nfBottomTurnSpeed;
 	if(m_nfRotationX > 360.0f)
 		m_nfRotationX -= 360.0f;
+}
+void CPosition::ZoomIn(bool keydown)
+{
+	if(keydown)
+	{
+		m_nfRotationZ -= 1.0f;
+	}
+}
+void CPosition::ZoomOut(bool keydown)
+{
+	if(keydown)
+	{
+		m_nfRotationZ += 1.0f;
+	}
 }
