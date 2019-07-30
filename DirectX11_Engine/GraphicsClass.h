@@ -29,13 +29,18 @@
 // tutorial 12
 #include "Text.h"
 
+// tutorial 16
+// 프러스텀 컬링 
+#include "ModelList.h"
+#include "Frustum.h"
+
 //////////////////////////////////////////////////////////////////////////
 
-const bool FULL_SCREEN = false;//true;
-const bool VSYNC_ENABLED = true;//false;
+const bool FULL_SCREEN = true;//true;
+const bool VSYNC_ENABLED = false;//false;
 const float SCREEN_DEPTH = 1000.0f;
 const float SCREEN_NEAR = 0.1f;
-const int TUTORIALTYPE = 13;
+const int TUTORIALTYPE = 16;
 
 class CGraphicsClass
 {
@@ -45,12 +50,14 @@ public:
 		SInputPosInfo()
 		{
 			nPosX = nPosY = nCPUper = nFPS = 0;
-			nCurTime = 0;
+			nCurTime = nRotationY = nRotationX = 0.0f;
 		}
 		SInputPosInfo(const SInputPosInfo& data)
 		{
 			nPosX = data.nPosX;
 			nPosY = data.nPosY;
+			nRotationY = data.nRotationY;
+			nRotationX = data.nRotationX;
 
 			sBuffer = data.sBuffer;
 
@@ -61,6 +68,8 @@ public:
 
 		int nPosX;
 		int nPosY;
+		float nRotationY;
+		float nRotationX;
 
 		char * sBuffer;
 
@@ -105,6 +114,10 @@ private:
 
 	// T12
 	CText * m_pText;
+
+	// T16
+	CModelList * m_pModelList;
+	CFrustum * m_pFrustum;
 
 	// saemi
 	float DirectionP[3];

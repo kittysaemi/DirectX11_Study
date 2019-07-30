@@ -39,12 +39,17 @@ bool CLightshaderClass::Initialize(ID3D11Device* _device, HWND hWnd, int _Tutori
 			return false;
 		}
 	}	
-	else if(_TutorialNum >= 10)
+	else if(_TutorialNum >= 10 && _TutorialNum <= 15)
 	{
 		if(!InitializeShader(_device, hWnd, L"../DirectX11_Engine/HLSL/Light-T10.vs", L"../DirectX11_Engine/HLSL/Light-T10.ps"))
 		{
 			return false;
 		}
+	}
+	else if(_TutorialNum == 16)
+	{
+		if(!InitializeShader(_device, hWnd, L"../DirectX11_Engine/HLSL/Light.vs", L"../DirectX11_Engine/HLSL/Light.ps"))
+			return false;
 	}
 
 	return true;

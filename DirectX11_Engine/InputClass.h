@@ -36,6 +36,10 @@ public:
 	void Shutdown();
 	bool Frame();
 
+	bool IsTopArrowPressed();
+	bool IsBottomArrowPressed();
+	bool IsRightArrowPressed();
+	bool IsLeftArrowPressed();
 	bool IsEscapePressed();
 	void GetMouseLocation(int &posX, int &posY);
 	char* GetKeyboardInputData();

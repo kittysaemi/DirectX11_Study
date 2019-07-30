@@ -10,6 +10,8 @@ CSystemClass::CSystemClass(void)
 	m_pCpu = 0;
 	m_pFps = 0;
 	m_pTimer = 0;
+
+	m_pPosition = 0;
 }
 
 CSystemClass::CSystemClass(const CSystemClass& other)
@@ -61,13 +63,25 @@ bool CSystemClass::Initialize()
 	m_pTimer = new CTimer;
 	if(!m_pTimer)
 		return false;
-	m_pTimer->Initialize();
+	if(!m_pTimer->Initialize())
+		return false;
+
+	m_pPosition = new CPosition;
+	if(!m_pPosition)
+		return false;
+
 
 	return true;
 }
 
 void CSystemClass::Shutdown()
 {
+	if(m_pPosition)
+	{
+		delete m_pPosition;
+		m_pPosition = 0;
+	}
+
 	if(m_pTimer)
 	{
 		delete m_pTimer;
@@ -180,13 +194,22 @@ bool CSystemClass::Frame()
 	// DirectInput Info
 	m_pInput->GetMouseLocation(info.nPosX, info.nPosY);
 	info.sBuffer = m_pInput->GetKeyboardInputData();
+
+	// T16 ÇÁ¸®½ºÅÒ 
+	m_pPosition->SetFrameTIme(m_pTimer->GetTIme());
+	m_pPosition->TurnLeft(m_pInput->IsLeftArrowPressed());
+	m_pPosition->TurnRight(m_pInput->IsRightArrowPressed());
+	m_pPosition->TurnTop(m_pInput->IsTopArrowPressed());
+	m_pPosition->TurnBottom(m_pInput->IsBottomArrowPressed());
+
+	m_pPosition->GetRotation(info.nRotationX, info.nRotationY);
+
 	
+	// GUI 
 	if(!m_pGraphics->Frame(info))
 		return false;
 
-
-
-
+	
 	return true;
 }
 LRESULT CALLBACK CSystemClass::MessageHandler(HWND hwnd, UINT jumsg, WPARAM wparam, LPARAM lparam)

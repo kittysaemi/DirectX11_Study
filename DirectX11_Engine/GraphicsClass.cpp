@@ -23,6 +23,9 @@ CGraphicsClass::CGraphicsClass(void)
 
 	m_pText = 0;
 
+	m_pModelList = 0;
+	m_pFrustum = 0;
+
 	// saemi	
 	DirectionP[0] = 1.0f;	
 	DirectionP[1] = 1.0f;	
@@ -225,7 +228,7 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 		if(!m_Bitmap->Initialize(m_D3D->GetDevice(), scW, scH, L"../DirectX11_Engine/data/wood.dds", 1200, 800))
 			return false;
 	}
-	else if(TUTORIALTYPE >= 12)
+	else if(TUTORIALTYPE >= 12 && TUTORIALTYPE <= 15)
 	{
 		// set the initial position of the camera.
 		m_Camera->SetPosition(0, 0, -1);
@@ -246,6 +249,57 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 			return false;
 
 	}
+	else if(TUTORIALTYPE >= 16)
+	{
+		// set the initial position of the camera.
+		m_Camera->SetPosition(0.0f, 0.0f, -1.0f);
+		m_Camera->Render();
+
+		D3DXMATRIX baseViewMatrix;
+		m_Camera->GetViewMatrix(baseViewMatrix);
+
+		m_pText = new CText;
+		if(!m_pText)
+			return false;
+
+		CText::TextPoint info;
+		info.sW = scW;
+		info.sH = scH;
+
+		if(!m_pText->Initialize(m_D3D->GetDevice(), m_D3D->GetDeviceContext(), hWnd, info, baseViewMatrix))
+			return false;
+
+		m_Model = new CModelClass;
+		if(!m_Model)
+			return false;
+
+		if(!m_Model->Initialize(m_D3D->GetDevice(), "../DirectX11_Engine/data/sphere.txt", L"../DirectX11_Engine/data/seafloor.dds" ))
+			return false;
+
+		m_pLightShader = new CLightshaderClass;
+		if(!m_pLightShader)
+			return false;
+
+		if(!m_pLightShader->Initialize(m_D3D->GetDevice(), hWnd, TUTORIALTYPE))
+			return false;
+
+		m_pLight = new CLightClass;
+		if(!m_pLight)
+			return false;
+
+		m_pLight->SetDirection(0.0f, 0.0f, 1.0f);
+
+		m_pModelList = new CModelList;
+		if(!m_pModelList)
+			return false;
+
+		if(!m_pModelList->Initialize(25))
+			return false;
+
+		m_pFrustum = new CFrustum;
+		if(!m_pFrustum)
+			return false;
+	}
 	else
 	{
 		return false;
@@ -258,6 +312,20 @@ void CGraphicsClass::Shutdown()
 {
 	// The TextureShaderClass object is also released in the shutdown function.
 	// Release the thing object.
+
+	//////////////////////////////////////////////////////////////////////////
+	// T16
+	if(m_pFrustum)
+	{
+		delete m_pFrustum;
+		m_pFrustum = 0;
+	}
+	if(m_pModelList)
+	{
+		m_pModelList->Shutdown();
+		delete m_pModelList;
+		m_pModelList = 0;
+	}
 
 	//////////////////////////////////////////////////////////////////////////
 	// T12
@@ -336,6 +404,12 @@ void CGraphicsClass::Shutdown()
 bool CGraphicsClass::Frame(SInputPosInfo data)
 {
 	m_pInputData = data;
+
+	if(TUTORIALTYPE >= 16)
+	{
+		m_Camera->SetPosition(0.0f, 0.0f, -10.0f);
+		m_Camera->SetRotation(m_pInputData.nRotationX, m_pInputData.nRotationY, 0.0f);
+	}
 
 	if(!Render())
 		return false;
@@ -444,7 +518,7 @@ bool CGraphicsClass::Render()
 		}
 
 	}
-	else if(TUTORIALTYPE >= 11)
+	else if(TUTORIALTYPE >= 11 && TUTORIALTYPE <= 12)
 	{
 		D3DXMATRIX otherMatrix;
 		m_D3D->GetOtherMatrix(otherMatrix);
@@ -488,6 +562,66 @@ bool CGraphicsClass::Render()
 
 		m_D3D->TurnZBufferOn();
 
+	}
+	else if(TUTORIALTYPE >= 16)
+	{
+		m_pFrustum->ConstructFrustum(SCREEN_DEPTH, _projectionMatrix, _viewMatrix);
+		
+		int nModelCnt = m_pModelList->GetModelCount();
+		
+		float x = 0.0f, y = 0.0f, z = 0.0f, r = 0.0f;
+		int nRenderCnt = 0;
+		D3DXVECTOR4 c;
+
+		// Go through all the models and render them only if they can be seen by the camera view.
+		for(int idx = 0; idx < nModelCnt; idx++)
+		{
+			// Get the position and color of the sphere model at this index.
+			m_pModelList->GetData(idx, x, y, z, c);
+
+			// Set the radius of the sphere to 1.0 since this is already known.
+			r = 1.0f;
+			
+			// check if the sphere model is in the view frustum.
+			// If it can be seen then render it, if not skip this model and check the next sphere.
+			if(m_pFrustum->CheckSphere(x, y, z, r))
+			{
+				// Move the model to the location it should be rendered at.
+				D3DXMatrixTranslation(&_worldMatrix, x, y, z);
+
+				// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
+				m_Model->Render(m_D3D->GetDeviceContext());
+
+				// Render the model using the light shader.
+				m_pLightShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), _worldMatrix, _viewMatrix, _projectionMatrix, m_Model->GetTexture(), m_pLight->GetDirection(), c);
+
+				// Reset to the original world matrix.
+				m_D3D->GetWorldMatrix(_worldMatrix);
+
+				// Since this model was rendered then increase the count for this frame.
+				nRenderCnt++;
+			}
+		}
+
+		// set the number of models that wa actually rendered this frame.
+		if(!m_pText->SetRenderCount(m_D3D->GetDeviceContext(), nRenderCnt))
+			return false;
+
+		// Turn off the Z buffer to begin all 2D rendering.
+		m_D3D->TurnZBufferOff();
+
+		// Turn on the alpha blending before rendering the text.
+		m_D3D->TurnOnAlphaBlending();
+
+		// Render the text string of the render count.
+		if(!m_pText->Render(m_D3D->GetDeviceContext(), _worldMatrix, _orthoMatrix))
+			return false;
+
+		// Turn off alpha blending after rendering the text.
+		m_D3D->TurnOffAlphaBlending();
+
+		// Turn the Z buffer back on now that all 2D rendering has completed.
+		m_D3D->TurnZBufferOn();
 	}
 	// Present the rendered scene to the screen.
 	m_D3D->EndScene();

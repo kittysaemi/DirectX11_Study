@@ -205,6 +205,30 @@ bool CInputClass::IsEscapePressed()
 
 	return false;
 }
+bool CInputClass::IsRightArrowPressed()
+{
+	if(m_cKeyState[DIK_LEFT] & 0x80)
+		return true;
+	return false;
+}
+bool CInputClass::IsLeftArrowPressed()
+{
+	if(m_cKeyState[DIK_RIGHT] & 0x80)
+		return true;
+	return false;
+}
+bool CInputClass::IsTopArrowPressed()
+{
+	if(m_cKeyState[DIK_UP] & 0x80)
+		return true;
+	return false;
+}
+bool CInputClass::IsBottomArrowPressed()
+{
+	if(m_cKeyState[DIK_DOWN] & 0x80)
+		return true;
+	return false;
+}
 
 bool CInputClass::IsPlayStatus(UINT _type)
 {

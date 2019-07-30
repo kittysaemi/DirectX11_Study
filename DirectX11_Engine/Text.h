@@ -60,6 +60,7 @@ public:
 	bool SetCPUpersentage(ID3D11DeviceContext * devContext, int cpu, int idx);
 	bool SetFps(ID3D11DeviceContext * devContext, int fps, int idx);
 	bool SetTimer(ID3D11DeviceContext * devContext, float TIme, int idx);
+	bool SetRenderCount(ID3D11DeviceContext * devContext, int rendCnt);
 
 private:
 	bool InitializeSentence(SentenceType** _sentenceData, int _maxLen, ID3D11Device* _device);
@@ -87,6 +88,11 @@ private:
 	TextPoint m_ComPoint[3];
 	FontColor m_ComColor[3];
 	SentenceType * m_ComInfo[3];
+
+
+	TextPoint		m_RenderPoint;
+	FontColor		m_RenderColor;
+	SentenceType *	m_RenderSentence;
 
 };
 

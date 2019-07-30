@@ -26,6 +26,11 @@ CText::CText(void)
 	for(int i=0; i<nC; i++)
 		m_ComInfo[i] = 0;
 
+	m_RenderColor.red = 0;
+	m_RenderColor.green = 1;
+	m_RenderColor.blue = 0;
+	
+
 }
 CText::CText(const CText& other)
 {
@@ -104,6 +109,9 @@ bool CText::Initialize(ID3D11Device * _device, ID3D11DeviceContext * _devContext
 		m_ComPoint[i].sY = 50 + ( i * 50 );
 	}
 
+	if(!InitializeSentence(&m_RenderSentence, 200, _device ))
+		return false;
+
 	return true;
 }
 
@@ -112,6 +120,7 @@ void CText::Shutdown()
 	ReleaseSentence(&m_KeyboadSetence);
 	ReleaseSentence(&m_MouseMoveSetence);
 	ReleaseSentence(&m_SoundSetence);
+	ReleaseSentence(&m_RenderSentence);
 
 
 	int nC = sizeof(m_sentence) / sizeof(m_sentence[0]);
@@ -157,6 +166,9 @@ bool CText::Render(ID3D11DeviceContext * _devContext, D3DXMATRIX _worldMatrix, D
 	 for(int i=0; i<nC; i++)
 		if(!RenderSetence(_devContext, m_ComInfo[i], _worldMatrix, _orthoMatrix))
 			return false;
+
+	 if(!RenderSetence(_devContext, m_RenderSentence, _worldMatrix, _orthoMatrix))
+		 return false;
 
 	return true;
 }
@@ -429,6 +441,21 @@ bool CText::SetTimer(ID3D11DeviceContext * devContext, float TIme, int idx)
 	m_ComColor[idx].blue = 0.0f;
 
 	if(!UpdateSentence(m_ComInfo[idx], FrameStr, m_ComPoint[idx].sX, m_ComPoint[idx].sY, m_ComColor[idx], devContext))
+		return false;
+
+	return true;
+}
+
+bool CText::SetRenderCount(ID3D11DeviceContext * devContext, int rendCnt)
+{
+	char Msg[200];
+
+	sprintf(Msg, "RenderCount : %d",rendCnt);
+
+	m_RenderPoint.sX = 200;
+	m_RenderPoint.sY = 50;
+
+	if(!UpdateSentence(m_RenderSentence, Msg, m_RenderPoint.sX, m_RenderPoint.sY, m_RenderColor, devContext))
 		return false;
 
 	return true;

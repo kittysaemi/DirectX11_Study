@@ -15,6 +15,10 @@
 // tutorial 15
 // fps, timer, cpu
 
+//////////////////////////////////////////////////////////////////////////
+// tutorial 16
+// 프러스텀 컬링 
+
 #ifndef _SYSTEMCLASS_H_
 #define _SYSTEMCLASS_H_
 
@@ -28,6 +32,7 @@
 #include "Fps.h"
 #include "Cpu.h"
 #include "Timer.h"
+#include "Position.h"
 
 class CSystemClass
 {
@@ -58,6 +63,7 @@ private:
 	CFps * m_pFps;
 	CCpu * m_pCpu;
 	CTimer * m_pTimer;
+	CPosition * m_pPosition;
 
 };
 
