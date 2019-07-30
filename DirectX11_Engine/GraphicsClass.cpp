@@ -273,7 +273,7 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 		if(!m_Model)
 			return false;
 
-		if(!m_Model->Initialize(m_D3D->GetDevice(), "../DirectX11_Engine/data/sphere.txt", L"../DirectX11_Engine/data/seafloor.dds" ))
+		if(!m_Model->Initialize(m_D3D->GetDevice(), "../DirectX11_Engine/data/cube.txt", L"../DirectX11_Engine/data/seafloor.dds" ))
 			return false;
 
 		m_pLightShader = new CLightshaderClass;
@@ -288,6 +288,10 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 			return false;
 
 		m_pLight->SetDirection(0.0f, 0.0f, 1.0f);
+
+		// �ݻ籤
+		m_pLight->SetSpecularColor(SpecularColor[0], SpecularColor[1], SpecularColor[2], SpecularColor[3]);
+		m_pLight->SetSpecularPower(SpecularPower);
 
 		m_pModelList = new CModelList;
 		if(!m_pModelList)
