@@ -1,0 +1,38 @@
+////////////////////
+// Multitexture.ps
+// 혼합할 두 텍스쳐가 저장 될 2개짜리 텍스쳐 배열을 추가한다.
+// 텍스쳐 배열을 사용하는 것은 그래픽 카드 성능의 관점에서 봤을 때, 두 개의 변수에 따로 텍스쳐를 담는 것보다 더 효율적이다.
+// DirectX의 이전 버전들은 텍스쳐 교체가 매우 비용이 큰 작업이었기 때문에 많은 엔진들이 텍스쳐와 재질 교체를 위해 작성되어야만 했다.
+// 텍스쳐 배열은 그런 성능상의 비용을 줄이는데 도움이 된다.
+////////////////////
+
+Texture2D shaderTextures[2];
+SamplerState SampleType;
+
+struct PixelInputType
+{
+	float4 position : SV_POSITION;
+	float2 tex : TEXCOORD0;
+};
+
+/*
+	모든 작업은 이 픽셀 세이더에서 이루어진다.
+	두 텍스처에서 현재 텍스쳐좌표에 해당하는 픽셀들을 샘플링한다.
+	그 다음에는 픽셁밧들이 감마 보정 때문에 비선형적인 값을 가지므로 일단 곱셈으로 이 둘을 혼합한다.
+	또한 감마값도 곱해주는데, 여기서는 모니터의 감마값이 2.0에 가깝기 때문에 2.0을 곱하도록 한다.
+	일단 혼합된 픽셀값이 구해지면 0 ~ 1 사이의 값을 가지도록 잘라내고 리턴한다.
+*/
+
+float4 MultiTexturePixelShader(PixelInputType input) : SV_TARGET
+{
+	float4 color1;
+	float4 color2;
+	float4 blendColor;
+	
+	color1 = shaderTextures[0].Sample(SampleType, input.tex);
+	color2 = shaderTextures[1].Sample(SampleType, input.tex);
+	blendColor = color1 * color2 * 2.0;
+	blendColor = saturate(blendColor);
+	
+	return blendColor;
+}

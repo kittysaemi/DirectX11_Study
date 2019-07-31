@@ -93,10 +93,12 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ModelClass.cpp" />
     <ClCompile Include="ModelList.cpp" />
+    <ClCompile Include="MultiTextureShader.cpp" />
     <ClCompile Include="Position.cpp" />
     <ClCompile Include="SoundClass.cpp" />
     <ClCompile Include="SystemClass.cpp" />
     <ClCompile Include="Text.cpp" />
+    <ClCompile Include="Texturearray.cpp" />
     <ClCompile Include="TextureClass.cpp" />
     <ClCompile Include="Textureshaderclass.cpp" />
     <ClCompile Include="Timer.cpp" />
@@ -117,10 +119,12 @@
     <ClInclude Include="LightshaderClass.h" />
     <ClInclude Include="ModelClass.h" />
     <ClInclude Include="ModelList.h" />
+    <ClInclude Include="MultiTextureShader.h" />
     <ClInclude Include="Position.h" />
     <ClInclude Include="SoundClass.h" />
     <ClInclude Include="SystemClass.h" />
     <ClInclude Include="Text.h" />
+    <ClInclude Include="Texturearray.h" />
     <ClInclude Include="TextureClass.h" />
     <ClInclude Include="Textureshaderclass.h" />
     <ClInclude Include="Timer.h" />

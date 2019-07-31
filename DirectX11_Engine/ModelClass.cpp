@@ -11,6 +11,9 @@ CModelClass::CModelClass(void)
 
 	// T7
 	m_pModelType = 0;
+
+	// T17
+	m_pTextureArray = 0;
 }
 CModelClass::CModelClass(const CModelClass& other)
 {
@@ -70,7 +73,19 @@ bool CModelClass::Initialize(ID3D11Device* _device, char* _modelfilename, WCHAR*
 
 	return true;
 }
+bool CModelClass::Initialize(ID3D11Device* _device, char* _modelfilename, WCHAR* _fileLIst[])
+{
+	if(!LoadModel(_modelfilename))
+		return false;
 
+	if(!InitializeBuffers(_device))
+		return false;
+
+	if(!LoadTexture(_device, _fileLIst))
+		return false;
+
+	return true;
+}
 void CModelClass::Shutdown()
 {
 	 // RELEASE the model texture.
@@ -101,6 +116,10 @@ int CModelClass::GetIndexCount()
 ID3D11ShaderResourceView* CModelClass::GetTexture()
 {
 	return m_pTexture->GetTexture();
+}
+ID3D11ShaderResourceView** CModelClass::GetTextureArray()
+{
+	return m_pTextureArray->GetTextureArray();
 }
 
 // 정점 버퍼와 인덱스 버퍼를 생성하는 작업을 제어한다. 데이터 파일로부터 모델의 정보를 읽어 와서 버퍼들을 만드는 일을 한다. 삼각형 하나만을 다루기 떄문에 간단히 정점 버퍼와 인덱스 버퍼에 점을 세팅하는 일만을 한다.
@@ -250,7 +269,7 @@ bool CModelClass::InitializeBuffers(ID3D11Device* _device)
 	{
 		_vertices[i].position = D3DXVECTOR3(m_pModelType[i].location[0], m_pModelType[i].location[1], m_pModelType[i].location[2]);
 		_vertices[i].texture = D3DXVECTOR2(m_pModelType[i].texture[0], m_pModelType[i].texture[1]);
-		_vertices[i].normal = D3DXVECTOR3(m_pModelType[i].normalvetor[0], m_pModelType[i].normalvetor[1], m_pModelType[i].normalvetor[2]);
+	//	_vertices[i].normal = D3DXVECTOR3(m_pModelType[i].normalvetor[0], m_pModelType[i].normalvetor[1], m_pModelType[i].normalvetor[2]);
 
 		_indices[i] = i;
 	}
@@ -374,9 +393,27 @@ bool CModelClass::LoadTexture(ID3D11Device* _device, WCHAR* _filename)
 
 	return true;
 }
+bool CModelClass::LoadTexture(ID3D11Device* _device, WCHAR* fileList[])
+{
+	m_pTextureArray = new CTexturearray;
+	if(!m_pTextureArray)
+		return false;
+
+	if(!m_pTextureArray->Initialize(_device, fileList))
+		return false;
+
+	return true;
+}
 
 void CModelClass::ReleaseTexture()
 {
+	if(m_pTextureArray)
+	{
+		m_pTextureArray->Shutdown();
+		delete m_pTextureArray;
+		m_pTextureArray = 0;
+	}
+
 	if(m_pTexture)
 	{
 		m_pTexture->Shutdown();

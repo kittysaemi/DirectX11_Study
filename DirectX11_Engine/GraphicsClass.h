@@ -34,13 +34,16 @@
 #include "ModelList.h"
 #include "Frustum.h"
 
+// tutorial 17
+#include "MultiTextureShader.h"
+
 //////////////////////////////////////////////////////////////////////////
 
 const bool FULL_SCREEN = true;//true;
 const bool VSYNC_ENABLED = false;//false;
 const float SCREEN_DEPTH = 1000.0f;
 const float SCREEN_NEAR = 0.1f;
-const int TUTORIALTYPE = 16;
+const int TUTORIALTYPE = 17;
 
 class CGraphicsClass
 {
@@ -121,6 +124,9 @@ private:
 	// T16
 	CModelList * m_pModelList;
 	CFrustum * m_pFrustum;
+
+	// T17
+	CMultiTextureShader * m_pMultiTextureShader;
 
 	// saemi
 	float DirectionP[3];

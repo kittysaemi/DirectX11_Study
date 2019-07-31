@@ -31,6 +31,9 @@ using namespace std;
 // T5
 #include "TextureClass.h"
 
+// T17
+#include "Texturearray.h"
+
 class CModelClass
 {
 private:
@@ -44,20 +47,20 @@ private:
 // 		D3DXVECTOR4 color;
 // 	};
 
-	// T5
-// 	struct VertexType
-// 	{
-// 		D3DXVECTOR3 position;
-// 		D3DXVECTOR2 texture;
-// 	};
-
-	// T6
+	// T5, T17
 	struct VertexType
 	{
 		D3DXVECTOR3 position;
 		D3DXVECTOR2 texture;
-		D3DXVECTOR3 normal;
 	};
+
+	// T6
+// 	struct VertexType
+// 	{
+// 		D3DXVECTOR3 position;
+// 		D3DXVECTOR2 texture;
+// 		D3DXVECTOR3 normal;
+// 	};
 
 	// T7
 	struct ModelType
@@ -75,6 +78,7 @@ public:
 	bool Initialize(ID3D11Device* _device);
 	bool Initialize(ID3D11Device* _device, WCHAR* _filename);	// T5 ~
 	bool Initialize(ID3D11Device* _device, char* _modelfilename, WCHAR* _texurefilename);	// T7
+	bool Initialize(ID3D11Device* _device, char* _modelfilename, WCHAR* _fileLIst[]);	// T17
 	void Shutdown();
 	void Render(ID3D11DeviceContext* _devContext);
 
@@ -82,6 +86,9 @@ public:
 
 	// T5
 	ID3D11ShaderResourceView* GetTexture();
+
+	// T11
+	ID3D11ShaderResourceView** GetTextureArray();
 
 
 private:
@@ -91,6 +98,8 @@ private:
 
 	// T5
 	bool LoadTexture(ID3D11Device* _device, WCHAR* _filename);
+	// T17
+	bool LoadTexture(ID3D11Device* _device, WCHAR* fileList[]);
 	void ReleaseTexture();
 
 	// T7
@@ -108,6 +117,9 @@ private:
 
 	// T7
 	ModelType * m_pModelType;
+
+	// T17
+	CTexturearray * m_pTextureArray;
 };
 
 #endif

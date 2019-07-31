@@ -26,6 +26,9 @@ CGraphicsClass::CGraphicsClass(void)
 	m_pModelList = 0;
 	m_pFrustum = 0;
 
+	// T17
+	m_pMultiTextureShader = 0;
+
 	// saemi	
 	DirectionP[0] = 1.0f;	
 	DirectionP[1] = 1.0f;	
@@ -249,7 +252,7 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 			return false;
 
 	}
-	else if(TUTORIALTYPE >= 16)
+	else if(TUTORIALTYPE == 16)
 	{
 		// set the initial position of the camera.
 		m_Camera->SetPosition(0.0f, 0.0f, -1.0f);
@@ -304,6 +307,30 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 		if(!m_pFrustum)
 			return false;
 	}
+	else if(TUTORIALTYPE >= 17)
+	{
+		m_Camera->SetPosition(0.0f, 0.0f, -1.0f);
+		m_Camera->Render();
+
+		D3DXMATRIX baseViewMatrix;
+		m_Camera->GetViewMatrix(baseViewMatrix);
+
+		m_Model = new CModelClass;
+		if(!m_Model)
+			return false;
+
+		WCHAR* fileList[2] = {L"../DirectX11_Engine/data/stone01.dds", L"../DirectX11_Engine/data/dirt01.dds"};
+
+		if(!m_Model->Initialize(m_D3D->GetDevice(), "../DirectX11_Engine/data/square.txt",fileList))
+			return false;
+
+		m_pMultiTextureShader = new CMultiTextureShader;
+		if(!m_pMultiTextureShader)
+			return false;
+
+		if(!m_pMultiTextureShader->Initialize(m_D3D->GetDevice(), hWnd))
+			return false;
+	}
 	else
 	{
 		return false;
@@ -316,6 +343,15 @@ void CGraphicsClass::Shutdown()
 {
 	// The TextureShaderClass object is also released in the shutdown function.
 	// Release the thing object.
+
+	//////////////////////////////////////////////////////////////////////////
+	// T17
+	if(m_pMultiTextureShader)
+	{
+		m_pMultiTextureShader->Shutdown();
+		delete m_pMultiTextureShader;
+		m_pMultiTextureShader = 0;
+	}
 
 	//////////////////////////////////////////////////////////////////////////
 	// T16
@@ -409,10 +445,14 @@ bool CGraphicsClass::Frame(SInputPosInfo data)
 {
 	m_pInputData = data;
 
-	if(TUTORIALTYPE >= 16)
+	if(TUTORIALTYPE == 16)
 	{
 		m_Camera->SetPosition(0.0f, 0.0f, m_pInputData.nRotationZ);
 		m_Camera->SetRotation(m_pInputData.nRotationX, m_pInputData.nRotationY, 0.0f);
+	}
+	else if(TUTORIALTYPE == 17)
+	{
+		m_Camera->SetPosition(0.0f, 0.0f, -5.0f);
 	}
 
 	if(!Render())
@@ -567,7 +607,7 @@ bool CGraphicsClass::Render()
 		m_D3D->TurnZBufferOn();
 
 	}
-	else if(TUTORIALTYPE >= 16)
+	else if(TUTORIALTYPE == 16)
 	{
 		m_pFrustum->ConstructFrustum(SCREEN_DEPTH, _projectionMatrix, _viewMatrix);
 		
@@ -626,6 +666,12 @@ bool CGraphicsClass::Render()
 
 		// Turn the Z buffer back on now that all 2D rendering has completed.
 		m_D3D->TurnZBufferOn();
+	}
+	else if(TUTORIALTYPE == 17)
+	{
+		m_Model->Render(m_D3D->GetDeviceContext());
+
+		m_pMultiTextureShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), _worldMatrix, _viewMatrix, _projectionMatrix, m_Model->GetTextureArray());
 	}
 	// Present the rendered scene to the screen.
 	m_D3D->EndScene();
