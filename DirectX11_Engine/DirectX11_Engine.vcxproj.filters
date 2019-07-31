@@ -90,6 +90,9 @@
     <ClCompile Include="Texturearray.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="LightMapShader.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InputClass.h">
@@ -162,6 +165,9 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Texturearray.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="LightMapShader.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

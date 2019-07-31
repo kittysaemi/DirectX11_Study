@@ -37,13 +37,16 @@
 // tutorial 17
 #include "MultiTextureShader.h"
 
+// tutorial 18
+#include "LightMapShader.h"
+
 //////////////////////////////////////////////////////////////////////////
 
 const bool FULL_SCREEN = true;//true;
 const bool VSYNC_ENABLED = false;//false;
 const float SCREEN_DEPTH = 1000.0f;
 const float SCREEN_NEAR = 0.1f;
-const int TUTORIALTYPE = 17;
+const int TUTORIALTYPE = 18;
 
 class CGraphicsClass
 {
@@ -127,6 +130,9 @@ private:
 
 	// T17
 	CMultiTextureShader * m_pMultiTextureShader;
+
+	// T18
+	CLightMapShader * m_pLightMapShader;
 
 	// saemi
 	float DirectionP[3];

@@ -29,6 +29,9 @@ CGraphicsClass::CGraphicsClass(void)
 	// T17
 	m_pMultiTextureShader = 0;
 
+	// T18
+	m_pLightMapShader = 0;
+
 	// saemi	
 	DirectionP[0] = 1.0f;	
 	DirectionP[1] = 1.0f;	
@@ -319,17 +322,31 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 		if(!m_Model)
 			return false;
 
-		WCHAR* fileList[2] = {L"../DirectX11_Engine/data/stone01.dds", L"../DirectX11_Engine/data/dirt01.dds"};
+//		WCHAR* fileList[2] = {L"../DirectX11_Engine/data/stone01.dds", L"../DirectX11_Engine/data/light01.dds"};
+		WCHAR* fileList[2] = {L"../DirectX11_Engine/data/MoonM.dds", L"../DirectX11_Engine/data/light02.dds"};
 
 		if(!m_Model->Initialize(m_D3D->GetDevice(), "../DirectX11_Engine/data/square.txt",fileList))
 			return false;
 
-		m_pMultiTextureShader = new CMultiTextureShader;
-		if(!m_pMultiTextureShader)
-			return false;
+		if(TUTORIALTYPE == 17)
+		{
+			m_pMultiTextureShader = new CMultiTextureShader;
+			if(!m_pMultiTextureShader)
+				return false;
 
-		if(!m_pMultiTextureShader->Initialize(m_D3D->GetDevice(), hWnd))
-			return false;
+			if(!m_pMultiTextureShader->Initialize(m_D3D->GetDevice(), hWnd))
+				return false;
+		}
+		else if(TUTORIALTYPE == 18)
+		{
+			m_Camera->SetPosition(0.0f, 0.0f, -10.0f);
+			m_pLightMapShader = new CLightMapShader;
+			if(!m_pLightMapShader)
+				return false;
+
+			if(!m_pLightMapShader->Initialize(m_D3D->GetDevice(), hWnd))
+				return false;
+		}
 	}
 	else
 	{
@@ -343,6 +360,15 @@ void CGraphicsClass::Shutdown()
 {
 	// The TextureShaderClass object is also released in the shutdown function.
 	// Release the thing object.
+
+	//////////////////////////////////////////////////////////////////////////
+	// T18
+	if(m_pLightMapShader)
+	{
+		m_pLightMapShader->Shutdown();
+		delete m_pLightMapShader;
+		m_pLightMapShader = 0;
+	}
 
 	//////////////////////////////////////////////////////////////////////////
 	// T17
@@ -672,6 +698,12 @@ bool CGraphicsClass::Render()
 		m_Model->Render(m_D3D->GetDeviceContext());
 
 		m_pMultiTextureShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), _worldMatrix, _viewMatrix, _projectionMatrix, m_Model->GetTextureArray());
+	}
+	else if(TUTORIALTYPE == 18)
+	{
+		m_Model->Render(m_D3D->GetDeviceContext());
+
+		m_pLightMapShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), _worldMatrix, _viewMatrix, _projectionMatrix, m_Model->GetTextureArray());
 	}
 	// Present the rendered scene to the screen.
 	m_D3D->EndScene();

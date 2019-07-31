@@ -89,6 +89,7 @@
     <ClCompile Include="GraphicsClass.cpp" />
     <ClCompile Include="InputClass.cpp" />
     <ClCompile Include="LightClass.cpp" />
+    <ClCompile Include="LightMapShader.cpp" />
     <ClCompile Include="LightshaderClass.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ModelClass.cpp" />
@@ -116,6 +117,7 @@
     <ClInclude Include="GraphicsClass.h" />
     <ClInclude Include="InputClass.h" />
     <ClInclude Include="LightClass.h" />
+    <ClInclude Include="LightMapShader.h" />
     <ClInclude Include="LightshaderClass.h" />
     <ClInclude Include="ModelClass.h" />
     <ClInclude Include="ModelList.h" />
