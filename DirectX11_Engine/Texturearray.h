@@ -27,7 +27,7 @@ public:
 private:
 	// This is the two element texture array private variable.
 	// T19 , °¹¼ö ´Ã¸²
-	ID3D11ShaderResourceView* m_TextureList[3];
+	ID3D11ShaderResourceView* m_TextureList[2];
 };
 
 

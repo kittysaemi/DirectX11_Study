@@ -14,6 +14,8 @@ CModelClass::CModelClass(void)
 
 	// T17
 	m_pTextureArray = 0;
+
+	m_nTutorialType = 0;
 }
 CModelClass::CModelClass(const CModelClass& other)
 {
@@ -73,10 +75,17 @@ bool CModelClass::Initialize(ID3D11Device* _device, char* _modelfilename, WCHAR*
 
 	return true;
 }
-bool CModelClass::Initialize(ID3D11Device* _device, char* _modelfilename, WCHAR* _fileLIst[])
+bool CModelClass::Initialize(ID3D11Device* _device, char* _modelfilename, WCHAR* _fileLIst[], int nTutorialType)
 {
 	if(!LoadModel(_modelfilename))
 		return false;
+
+	m_nTutorialType = nTutorialType;
+	if(m_nTutorialType == 20)
+	{
+		// Calculate the normal, tangent, and binormal vectors for the model.
+		CalculateModelVectors();
+	}
 
 	if(!InitializeBuffers(_device))
 		return false;
@@ -265,17 +274,31 @@ bool CModelClass::InitializeBuffers(ID3D11Device* _device)
 
 	// Load the vertex array and index array with data.
 
-	for(int i=0; i<m_nVertexCount; i++)
+
+	if(m_nTutorialType < 20)
 	{
-		_vertices[i].position = D3DXVECTOR3(m_pModelType[i].location[0], m_pModelType[i].location[1], m_pModelType[i].location[2]);
-		_vertices[i].texture = D3DXVECTOR2(m_pModelType[i].texture[0], m_pModelType[i].texture[1]);
-	//	_vertices[i].normal = D3DXVECTOR3(m_pModelType[i].normalvetor[0], m_pModelType[i].normalvetor[1], m_pModelType[i].normalvetor[2]);
+		for(int i=0; i<m_nVertexCount; i++)
+		{
+			_vertices[i].position = D3DXVECTOR3(m_pModelType[i].location[0], m_pModelType[i].location[1], m_pModelType[i].location[2]);
+			_vertices[i].texture = D3DXVECTOR2(m_pModelType[i].texture[0], m_pModelType[i].texture[1]);
+		//	_vertices[i].normal = D3DXVECTOR3(m_pModelType[i].normalvetor[0], m_pModelType[i].normalvetor[1], m_pModelType[i].normalvetor[2]);
 
-		_indices[i] = i;
+			_indices[i] = i;
+		}
 	}
+	else if(m_nTutorialType == 20)
+	{
+		for(int i=0; i<m_nVertexCount; i++)
+		{
+			_vertices[i].position = D3DXVECTOR3(m_pModelType[i].location[0], m_pModelType[i].location[1], m_pModelType[i].location[2]);
+			_vertices[i].texture = D3DXVECTOR2(m_pModelType[i].texture[0], m_pModelType[i].texture[1]);
+			_vertices[i].normal = D3DXVECTOR3(m_pModelType[i].normalvetor[0], m_pModelType[i].normalvetor[1], m_pModelType[i].normalvetor[2]);
+			_vertices[i].tangent = D3DXVECTOR3(m_pModelType[i].tangentvetor[0], m_pModelType[i].tangentvetor[1], m_pModelType[i].tangentvetor[2]);
+			_vertices[i].binormal = D3DXVECTOR3(m_pModelType[i].binormalvetor[0], m_pModelType[i].binormalvetor[1], m_pModelType[i].binormalvetor[2]);
 
-
-
+			_indices[i] = i;
+		}
+	}
 
 	// Set up the description of the vertex buffer.
 	D3D11_BUFFER_DESC _vertexBufferDesc;
@@ -481,4 +504,124 @@ void CModelClass::ReleaseModel()
 	}
 
 	return;
+}
+
+void CModelClass::CalculateModelVectors()
+{
+	// Calculate the number of faces in the model.
+	int faceCount = m_nVertexCount / 3;
+
+	// Initialize the index to the model data.
+	int index = 0;
+
+	// Go through all the faces and calculate the tangent, binormal, and normal vectors.
+	for(int i=0; i<faceCount; i++)
+	{
+		TempVertexType v1, v2, v3;
+		VectorType tangent, binormal, normal;
+
+		// Get the three vetices for this face from the model.
+		SetData(v1, index++);
+		SetData(v2, index++);
+		SetData(v3, index++);
+
+		// Calculate the tangent and binormal of that face.
+		CalculateTangentBinormal(v1, v2, v3, tangent, binormal);
+
+		// Calculate the new normal using the tangent and binormal.
+		CalculateNormal(tangent, binormal, normal);
+
+		// Store the normal, tangent, and binormal for this face back in the model structure.
+		SetData(index - 1, normal, tangent, binormal);
+		SetData(index - 2, normal, tangent, binormal);
+		SetData(index - 3, normal, tangent, binormal);
+
+	}
+}
+
+void CModelClass::SetData(TempVertexType &vertex, int allidx)
+{
+	for(int loop = 0; loop <3; loop++)
+	{
+		vertex.location[loop] = m_pModelType[allidx].location[loop];
+		vertex.normalvetor[loop] = m_pModelType[allidx].normalvetor[loop];
+	}
+	for(int loop2 = 0; loop2 < 2; loop2++)
+	{
+		vertex.texture[loop2] = m_pModelType[allidx].texture[loop2];
+	}
+}
+void CModelClass::SetData(int allidx, VectorType normal, VectorType tangent, VectorType binormal)
+{
+	for(int i = 0; i< 3; i++)
+	{
+		m_pModelType[allidx].normalvetor[i] = normal.location[i];
+		m_pModelType[allidx].tangentvetor[i] = tangent.location[i];
+		m_pModelType[allidx].binormalvetor[i] = binormal.location[i];
+	}
+}
+
+void CModelClass::CalculateTangentBinormal(TempVertexType _TempVT1, TempVertexType _TempVT2, TempVertexType _TempVT3, VectorType& tangent, VectorType& binormal)
+{
+	float vector1[3], vector2[3], tuVector[2], tvVector[2];
+
+	for(int i=0; i<3; i++)
+	{
+		// Calculate the two vectors for this face.
+		vector1[i] = _TempVT2.location[i] - _TempVT1.location[i];
+		vector2[i] = _TempVT3.location[i] - _TempVT1.location[i];
+	}
+
+	// Calculate the tu and tv texture space vectors.
+	tuVector[0] = _TempVT2.texture[0] - _TempVT1.texture[0];
+	tvVector[0] = _TempVT2.texture[1] - _TempVT1.texture[1];
+
+	tuVector[1] = _TempVT3.texture[0] - _TempVT1.texture[0];	
+	tvVector[1] = _TempVT3.texture[1] - _TempVT1.texture[1];
+
+	// Calculate the denominator of the tangent / binormal equation.
+	float den = 1.0f / (tuVector[0] * tvVector[1] - tuVector[1] * tvVector[0]);
+
+	// Calculate the cross products and multiply by the coefficient to get the tangent and binormal.
+	tangent.location[0] = (tvVector[1] * vector1[0] - tvVector[0] * vector2[0]) * den;
+	tangent.location[1] = (tvVector[1] * vector1[1] - tvVector[0] * vector2[1]) * den;
+	tangent.location[2] = (tvVector[1] * vector1[2] - tvVector[0] * vector2[2]) * den;
+
+	binormal.location[0] = (tuVector[0] * vector2[0] - tuVector[1] * vector1[0]) * den;
+	binormal.location[1] = (tuVector[0] * vector2[1] - tuVector[1] * vector1[1]) * den;
+	binormal.location[2] = (tuVector[0] * vector2[2] - tuVector[1] * vector1[2]) * den;
+
+	// Calculate the length of this normal.
+	float len = sqrt((tangent.location[0] * tangent.location[0]) + (tangent.location[1] * tangent.location[1]) + (tangent.location[2] * tangent.location[2]));
+
+	// Normalize the normal and then store it
+	for(int i=0; i<3; i++)
+	{
+		tangent.location[i] = tangent.location[i] / len;
+	}
+
+	// Calculate the length of this normal.
+
+	len = sqrt((binormal.location[0] * binormal.location[0]) + (binormal.location[1] * binormal.location[1]) + (binormal.location[2] * binormal.location[2]));
+
+	// Normalize the normal and then store it.
+	for(int i=0; i<3; i++)
+		binormal.location[i] = binormal.location[i] / len;
+
+}
+
+void CModelClass::CalculateNormal(VectorType tangent, VectorType binormal, VectorType& normal)
+{
+	// Calculate the cross product of the tangent and binormal which will give the normal vector.
+	normal.location[0] = (tangent.location[1] * binormal.location[2]) - (tangent.location[2] * binormal.location[1]);
+	normal.location[1] = (tangent.location[2] * binormal.location[0]) - (tangent.location[0] * binormal.location[2]);
+	normal.location[2] = (tangent.location[0] * binormal.location[1]) - (tangent.location[1] * binormal.location[0]);
+
+	// Calculate the length of the normal.
+	float len = sqrt((normal.location[0] * normal.location[0]) + (normal.location[1] * normal.location[1]) + (normal.location[2] * normal.location[2]));
+
+	// Normalize the normal.
+	normal.location[0] = normal.location[0] / len;
+	normal.location[1] = normal.location[1] / len;
+	normal.location[2] = normal.location[2] / len;
 }

@@ -48,10 +48,20 @@ private:
 // 	};
 
 	// T5, T17
+// 	struct VertexType
+// 	{
+// 		D3DXVECTOR3 position;
+// 		D3DXVECTOR2 texture;
+// 	};
+
+	// T20
 	struct VertexType
 	{
 		D3DXVECTOR3 position;
 		D3DXVECTOR2 texture;
+		D3DXVECTOR3 normal;
+		D3DXVECTOR3 tangent;
+		D3DXVECTOR3 binormal;
 	};
 
 	// T6
@@ -63,11 +73,31 @@ private:
 // 	};
 
 	// T7
+// 	struct ModelType
+// 	{
+// 		float location[3];		// 위치
+// 		float texture[2];		// 텍스쳐
+// 		float normalvetor[3];	// 법선 벡터
+// 	};
+
+	// T20
 	struct ModelType
 	{
 		float location[3];		// 위치
 		float texture[2];		// 텍스쳐
 		float normalvetor[3];	// 법선 벡터
+		float tangentvetor[3];
+		float binormalvetor[3];
+	};
+	struct TempVertexType
+	{
+		float location[3];
+		float texture[2];
+		float normalvetor[3];
+	};
+	struct VectorType
+	{
+		float location[3];
 	};
 
 public:
@@ -78,7 +108,7 @@ public:
 	bool Initialize(ID3D11Device* _device);
 	bool Initialize(ID3D11Device* _device, WCHAR* _filename);	// T5 ~
 	bool Initialize(ID3D11Device* _device, char* _modelfilename, WCHAR* _texurefilename);	// T7
-	bool Initialize(ID3D11Device* _device, char* _modelfilename, WCHAR* _fileLIst[]);	// T17
+	bool Initialize(ID3D11Device* _device, char* _modelfilename, WCHAR* _fileLIst[], int nTutorialType);	// T17 - T20
 	void Shutdown();
 	void Render(ID3D11DeviceContext* _devContext);
 
@@ -106,7 +136,11 @@ private:
 	bool LoadModel(char* _fileName);
 	void ReleaseModel();
 
-private:
+	// T20
+	void CalculateModelVectors();
+	void CalculateTangentBinormal(TempVertexType _TempVT1, TempVertexType _TempVT2, TempVertexType _TempVT3, VectorType& tangent, VectorType& binormal);
+	void CalculateNormal(VectorType tangent, VectorType binormal, VectorType& normal);
+
 	ID3D11Buffer *m_pVertexBuffer;
 	ID3D11Buffer *m_pIndexBuffer;
 	int	m_nVertexCount;
@@ -120,6 +154,11 @@ private:
 
 	// T17
 	CTexturearray * m_pTextureArray;
+
+
+	int m_nTutorialType;
+	void SetData(TempVertexType &vertex, int allidx);
+	void SetData(int allidx, VectorType normal, VectorType tangent, VectorType binormal);
 };
 
 #endif

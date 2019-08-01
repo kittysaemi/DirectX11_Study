@@ -79,6 +79,7 @@
   <ItemGroup>
     <ClCompile Include="AlphaMapShader.cpp" />
     <ClCompile Include="BitmapClass.cpp" />
+    <ClCompile Include="BumpMapShader.cpp" />
     <ClCompile Include="CameraClass.cpp" />
     <ClCompile Include="ColorShaderClass.cpp" />
     <ClCompile Include="Cpu.cpp" />
@@ -108,6 +109,7 @@
   <ItemGroup>
     <ClInclude Include="AlphaMapShader.h" />
     <ClInclude Include="BitmapClass.h" />
+    <ClInclude Include="BumpMapShader.h" />
     <ClInclude Include="CameraClass.h" />
     <ClInclude Include="ColorShaderClass.h" />
     <ClInclude Include="Cpu.h" />

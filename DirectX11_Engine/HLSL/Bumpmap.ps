@@ -1,0 +1,65 @@
+/////////////////////
+// Bumpmap.ps
+/////////////////////
+
+// 범프 맵 셰이더는 두 종류의 텍스쳐를 배열로 받아들이는데, 배열의 첫번째 것은 색상 텍스쳐이고, 두번째 것은 노멀 맵입니다.
+
+Texture2D shaderTextures[2];
+SamplerState SampleType;
+
+cbuffer LightBuffer
+{
+	float4 diffuseColor;
+	float3 lightDirection;
+};
+
+struct PixelInputType
+{
+	float4 position : SV_POSITION;
+	float2 tex : TEXCOORD0;
+	float3 normal : NORMAL;
+	float3 tangent : TANGENT;
+	float3 binormal : BINORMAL;
+};
+
+/*
+	픽셀 셰이더는 앞서 말했던 것처럼 동작시키기 위해서 코드 몇 줄을 추가합니다.
+	우선 색상 텍스쳐와 노멀 맵에서 픽셀값을 샘플링합니다. 그리고 노멀 맵의 값에 2를 곱하고 1을 빼서 -1.0 ~ 1.0 범위가 되게 합니다.
+	이렇게 하는 이유는 샘플링된 값이 0 ~ 1.0 사이의 값인데 이 범위는 범프맵 연산을 위한 범위의 반쪽밖에 되지 않기 때문이다.
+	그 다음에는 위에 썼던 공식을 활용하여 변환된 법선을 계산한다.
+	이 변환된 법선은 정규화되어 나중에 빛의 방향과의 내적으로 빛의 밝기를 계산할 때 스입니다.
+	픽셀의 빛이ㅢ 밝기가 구해졌다면 범프 매핑은 끝.
+	남은 일은 빛의 강도와 빛의 색상, 텍스쳐 색상을 곱하여 픽셀의 최종 색상을 구하는 것이다.
+*/
+
+float4 BumpMapPixelShader(PixelInputType input) : SV_TARGET
+{
+	// Sample the texture pixel at this location.
+	float4 textureColor = shaderTextures[0].Sample(SampleType, input.tex);
+	
+	// Sample the pixel in the bump map.
+	float4 bumpMap = shaderTextures[1].Sample(SampleType, input.tex);
+	
+	// Expand the range of the normal value from (0, +1) t (-1, +1).
+	bumpMap = (bumpMap * 2.0f) - 1.0f;
+	
+	// Calculate the normal from the data in the bump map.
+	float3 bumpNormal = input.normal + bumpMap.x * input.tangent + bumpMap.y * input.binormal;
+	
+	// Normalize the resulting bump normal.
+	bumpNormal = normalize(bumpNormal);
+	
+	// Invert the light direction for calculations.
+	float3 lightDir = -lightDirection;
+	
+	// Calculate the amount of light on this pixel based on the bump map normal value.
+	float lightIntensity = saturate(dot(bumpNormal, lightDir));
+	
+	// Determine the final diffuse color based on the diffuse color and the amount of light intensity.
+	float4 color = saturate(diffuseColor * lightIntensity);
+	
+	// Combine the final bump light color with the texture color.
+	color = color * textureColor;
+	
+	return color;
+}

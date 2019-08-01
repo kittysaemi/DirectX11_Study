@@ -43,13 +43,16 @@
 // tutorial 19
 #include "AlphaMapShader.h"
 
+// tutorial 20
+#include "BumpMapShader.h"
+
 //////////////////////////////////////////////////////////////////////////
 
 const bool FULL_SCREEN = true;//true;
 const bool VSYNC_ENABLED = false;//false;
 const float SCREEN_DEPTH = 1000.0f;
 const float SCREEN_NEAR = 0.1f;
-const int TUTORIALTYPE = 19;
+const int TUTORIALTYPE = 20;
 
 class CGraphicsClass
 {
@@ -139,6 +142,9 @@ private:
 
 	// T19
 	CAlphaMapShader * m_pAlphaMapShader;
+
+	// T20
+	CBumpMapShader * m_pBumpMapShader;
 
 	// saemi
 	float DirectionP[3];

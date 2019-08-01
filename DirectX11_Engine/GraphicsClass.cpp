@@ -35,6 +35,9 @@ CGraphicsClass::CGraphicsClass(void)
 	// T19
 	m_pAlphaMapShader = 0;
 
+	// T20
+	m_pBumpMapShader = 0;
+
 	// saemi	
 	DirectionP[0] = 1.0f;	
 	DirectionP[1] = 1.0f;	
@@ -313,7 +316,7 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 		if(!m_pFrustum)
 			return false;
 	}
-	else if(TUTORIALTYPE >= 17 && TUTORIALTYPE <= 18)
+	else if(TUTORIALTYPE >= 17)
 	{
 		m_Camera->SetPosition(0.0f, 0.0f, -1.0f);
 		m_Camera->Render();
@@ -325,56 +328,66 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 		if(!m_Model)
 			return false;
 
-//		WCHAR* fileList[2] = {L"../DirectX11_Engine/data/stone01.dds", L"../DirectX11_Engine/data/light01.dds"};
-		WCHAR* fileList[2] = {L"../DirectX11_Engine/data/MoonM.dds", L"../DirectX11_Engine/data/light02.dds"};
+		WCHAR * fileLIst[2] = {L"../DirectX11_Engine/data/stone01.dds", L"../DirectX11_Engine/data/bump01.dds"};
 
-		if(!m_Model->Initialize(m_D3D->GetDevice(), "../DirectX11_Engine/data/square.txt",fileList))
+		if(!m_Model->Initialize(m_D3D->GetDevice(), "../DirectX11_Engine/data/cube.txt", fileLIst, TUTORIALTYPE))
 			return false;
 
-		if(TUTORIALTYPE == 17)
+
+		switch(TUTORIALTYPE)
 		{
-			m_pMultiTextureShader = new CMultiTextureShader;
-			if(!m_pMultiTextureShader)
-				return false;
+		case 17:
+			{
+				m_pMultiTextureShader = new CMultiTextureShader;
+				if(!m_pMultiTextureShader)
+					return false;
 
-			if(!m_pMultiTextureShader->Initialize(m_D3D->GetDevice(), hWnd))
-				return false;
+				if(!m_pMultiTextureShader->Initialize(m_D3D->GetDevice(), hWnd))
+					return false;
+			}
+			break;
+		case 18:
+			{
+				m_Camera->SetPosition(0.0f, 0.0f, -10.0f);
+				m_pLightMapShader = new CLightMapShader;
+				if(!m_pLightMapShader)
+					return false;
+
+				if(!m_pLightMapShader->Initialize(m_D3D->GetDevice(), hWnd))
+					return false;
+			}
+			break;
+		case 19:
+			{
+				m_pAlphaMapShader = new CAlphaMapShader;
+				if(!m_pAlphaMapShader)
+					return false;
+
+				if(!m_pAlphaMapShader->Initialize(m_D3D->GetDevice(), hWnd))
+					return false;
+
+				break;
+			}
+		case 20:
+			{
+				m_pBumpMapShader = new CBumpMapShader;
+				if(!m_pBumpMapShader)
+					return false;
+
+				if(!m_pBumpMapShader->Initialize(m_D3D->GetDevice(), hWnd))
+					return false;
+
+				m_pLight = new CLightClass;
+				if(!m_pLight)
+					return false;
+
+				m_pLight->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
+				m_pLight->SetDirection(0.0f, 1.0f, 2.0f);
+				m_Camera->SetPosition(0.0f, 0.0f, -10.0f);
+
+				break;
+			}
 		}
-		else if(TUTORIALTYPE == 18)
-		{
-			m_Camera->SetPosition(0.0f, 0.0f, -10.0f);
-			m_pLightMapShader = new CLightMapShader;
-			if(!m_pLightMapShader)
-				return false;
-
-			if(!m_pLightMapShader->Initialize(m_D3D->GetDevice(), hWnd))
-				return false;
-		}
-	}
-	else if(TUTORIALTYPE == 19)
-	{
-		m_Camera->SetPosition(0.0f, 0.0f, -1.0f);
-		m_Camera->Render();
-
-		D3DXMATRIX baseMatrix;
-		m_Camera->GetViewMatrix(baseMatrix);
-
-		m_Model = new CModelClass;
-		if(!m_Model)
-			return false;
-
-//		WCHAR * fileLIst[3] = {L"../DirectX11_Engine/data/stone01.dds", L"../DirectX11_Engine/data/dirt01.dds", L"../DirectX11_Engine/data/alpha01.dds"};
-		WCHAR * fileLIst[3] = {L"../DirectX11_Engine/data/MoonM.dds", L"../DirectX11_Engine/data/wood.dds", L"../DirectX11_Engine/data/light02.dds"};
-
-		if(!m_Model->Initialize(m_D3D->GetDevice(), "../DirectX11_Engine/data/square.txt", fileLIst))
-			return false;
-
-		m_pAlphaMapShader = new CAlphaMapShader;
-		if(!m_pAlphaMapShader)
-			return false;
-
-		if(!m_pAlphaMapShader->Initialize(m_D3D->GetDevice(), hWnd))
-			return false;
 	}
 	else
 	{
@@ -388,6 +401,15 @@ void CGraphicsClass::Shutdown()
 {
 	// The TextureShaderClass object is also released in the shutdown function.
 	// Release the thing object.
+
+	//////////////////////////////////////////////////////////////////////////
+	// T20
+	if(m_pBumpMapShader)
+	{
+		m_pBumpMapShader->Shutdown();
+		delete m_pBumpMapShader;
+		m_pBumpMapShader = 0;
+	}
 
 	//////////////////////////////////////////////////////////////////////////
 	// T19
@@ -754,6 +776,26 @@ bool CGraphicsClass::Render()
 	case 19:
 		{
 			m_pAlphaMapShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), _worldMatrix, _viewMatrix, _projectionMatrix, m_Model->GetTextureArray());
+		}
+		break;
+	case 20:
+		{
+			// Update the rotation variable each frame.
+			static float rotation = 0.0f;
+
+			rotation += (float)D3DX_PI * 0.0025f;	// 속도 줄이기
+			//rotation += (float)D3DX_PI * 0.01f;
+			if(rotation > 360.0f)
+			{
+				rotation -= 360.0f;
+			}
+
+			// Rotate the world matrix by the rotation value so that the triangle will spin.
+			D3DXMatrixRotationY(&_worldMatrix, rotation);
+
+			m_Model->Render(m_D3D->GetDeviceContext());
+
+			m_pBumpMapShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), _worldMatrix, _viewMatrix, _projectionMatrix, m_Model->GetTextureArray(), m_pLight->GetDirection(), m_pLight->GetDiffuseColor());
 		}
 		break;
 	}
