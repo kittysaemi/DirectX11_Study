@@ -3,6 +3,8 @@
 // TextureClass 대체
 // 여러개의 텍스쳐를 가지고 접근 할 수 있도록 해준다.
 
+
+
 #pragma once
 #ifndef _TEXTUREARRAY_H_
 #define _TEXTUREARRAY_H_
@@ -24,7 +26,8 @@ public:
 
 private:
 	// This is the two element texture array private variable.
-	ID3D11ShaderResourceView* m_TextureList[2];
+	// T19 , 갯수 늘림
+	ID3D11ShaderResourceView* m_TextureList[3];
 };
 
 

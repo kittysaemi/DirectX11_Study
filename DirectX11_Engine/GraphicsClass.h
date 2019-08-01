@@ -40,13 +40,16 @@
 // tutorial 18
 #include "LightMapShader.h"
 
+// tutorial 19
+#include "AlphaMapShader.h"
+
 //////////////////////////////////////////////////////////////////////////
 
 const bool FULL_SCREEN = true;//true;
 const bool VSYNC_ENABLED = false;//false;
 const float SCREEN_DEPTH = 1000.0f;
 const float SCREEN_NEAR = 0.1f;
-const int TUTORIALTYPE = 18;
+const int TUTORIALTYPE = 19;
 
 class CGraphicsClass
 {
@@ -133,6 +136,9 @@ private:
 
 	// T18
 	CLightMapShader * m_pLightMapShader;
+
+	// T19
+	CAlphaMapShader * m_pAlphaMapShader;
 
 	// saemi
 	float DirectionP[3];
