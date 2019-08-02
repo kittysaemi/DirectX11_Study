@@ -81,7 +81,7 @@ bool CModelClass::Initialize(ID3D11Device* _device, char* _modelfilename, WCHAR*
 		return false;
 
 	m_nTutorialType = nTutorialType;
-	if(m_nTutorialType == 20)
+	if(m_nTutorialType == 20 || m_nTutorialType == 21)
 	{
 		// Calculate the normal, tangent, and binormal vectors for the model.
 		CalculateModelVectors();
@@ -286,7 +286,7 @@ bool CModelClass::InitializeBuffers(ID3D11Device* _device)
 			_indices[i] = i;
 		}
 	}
-	else if(m_nTutorialType == 20)
+	else if(m_nTutorialType == 20 || m_nTutorialType == 21)
 	{
 		for(int i=0; i<m_nVertexCount; i++)
 		{

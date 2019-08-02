@@ -410,6 +410,8 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 				m_pLight->SetSpecularColor(1.0f, 1.0f, 1.0f, 1.0f);
 				m_pLight->SetSpecularPower(16.0f);
 
+				
+
 				break;
 			}
 		}
@@ -569,7 +571,7 @@ bool CGraphicsClass::Frame(SInputPosInfo data)
 		m_Camera->SetPosition(0.0f, 0.0f, m_pInputData.nRotationZ);
 		m_Camera->SetRotation(m_pInputData.nRotationX, m_pInputData.nRotationY, 0.0f);
 	}
-	else if(TUTORIALTYPE == 17 || TUTORIALTYPE == 19)
+	else if(TUTORIALTYPE == 17 || TUTORIALTYPE == 19 || TUTORIALTYPE == 21)
 	{
 		m_Camera->SetPosition(0.0f, 0.0f, -5.0f);
 	}
@@ -617,7 +619,7 @@ bool CGraphicsClass::Render()
 		// Update the rotation variable each frame.
 		static float rotation = 0.0f;
 
-		rotation += (float)D3DX_PI * 0.001f;	// 속도 줄이기
+		rotation += (float)D3DX_PI * 0.00025f;	// 속도 줄이기
 		//rotation += (float)D3DX_PI * 0.01f;
 		if(rotation > 360.0f)
 		{
