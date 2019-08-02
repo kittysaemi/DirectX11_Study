@@ -38,6 +38,9 @@ CGraphicsClass::CGraphicsClass(void)
 	// T20
 	m_pBumpMapShader = 0;
 
+	// T21
+	m_pSpecMapShader = 0;
+
 	// saemi	
 	DirectionP[0] = 1.0f;	
 	DirectionP[1] = 1.0f;	
@@ -108,6 +111,8 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 		OutputDebugStringA("Could not Create Cameraclass");
 		return false;
 	}
+
+
 
 
 	if(TUTORIALTYPE < 11)
@@ -328,7 +333,7 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 		if(!m_Model)
 			return false;
 
-		WCHAR * fileLIst[2] = {L"../DirectX11_Engine/data/stone01.dds", L"../DirectX11_Engine/data/bump01.dds"};
+		WCHAR * fileLIst[3] = {L"../DirectX11_Engine/data/stone02.dds", L"../DirectX11_Engine/data/bump02.dds", L"../DirectX11_Engine/data/spec02.dds"};
 
 		if(!m_Model->Initialize(m_D3D->GetDevice(), "../DirectX11_Engine/data/cube.txt", fileLIst, TUTORIALTYPE))
 			return false;
@@ -387,6 +392,26 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 
 				break;
 			}
+		case 21:
+			{
+				m_pSpecMapShader = new CSpecMapShader;
+				if(!m_pSpecMapShader)
+					return false;
+
+				if(!m_pSpecMapShader->Initialize(m_D3D->GetDevice(), hWnd))
+					return false;
+
+				m_pLight = new CLightClass;
+				if(!m_pLight)
+					return false;
+
+				m_pLight->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
+				m_pLight->SetDirection(0.0f, 0.0f, 1.0f);
+				m_pLight->SetSpecularColor(1.0f, 1.0f, 1.0f, 1.0f);
+				m_pLight->SetSpecularPower(16.0f);
+
+				break;
+			}
 		}
 	}
 	else
@@ -401,6 +426,15 @@ void CGraphicsClass::Shutdown()
 {
 	// The TextureShaderClass object is also released in the shutdown function.
 	// Release the thing object.
+
+	//////////////////////////////////////////////////////////////////////////
+	// T21
+	if(m_pSpecMapShader)
+	{
+		m_pSpecMapShader->Shutdown();
+		delete m_pSpecMapShader;
+		m_pSpecMapShader = 0;
+	}
 
 	//////////////////////////////////////////////////////////////////////////
 	// T20
@@ -578,25 +612,26 @@ bool CGraphicsClass::Render()
 	D3DXMATRIX _orthoMatrix;
 	m_D3D->GetOtherMatrix(_orthoMatrix);
 
+	if((TUTORIALTYPE >= 6 && TUTORIALTYPE < 11) || TUTORIALTYPE == 20 || TUTORIALTYPE == 21)
+	{
+		// Update the rotation variable each frame.
+		static float rotation = 0.0f;
+
+		rotation += (float)D3DX_PI * 0.001f;	// 속도 줄이기
+		//rotation += (float)D3DX_PI * 0.01f;
+		if(rotation > 360.0f)
+		{
+			rotation -= 360.0f;
+		}
+
+		// 월드 행렬을 회전값만큼 회전시켜 이 행렬을 이용하여 삼각형을 그릴 떄 그 값만큼 회전되어 보이게 한다.
+		// Rotate the world matrix by the rotation value so that the triangle will spin.
+		D3DXMatrixRotationY(&_worldMatrix, rotation);
+	}
+
 
 	if(TUTORIALTYPE < 11)
 	{
-		if(TUTORIALTYPE >= 6)
-		{
-			// Update the rotation variable each frame.
-			static float rotation = 0.0f;
-
-			rotation += (float)D3DX_PI * 0.001f;	// 속도 줄이기
-			//rotation += (float)D3DX_PI * 0.01f;
-			if(rotation > 360.0f)
-			{
-				rotation -= 360.0f;
-			}
-
-			// 월드 행렬을 회전값만큼 회전시켜 이 행렬을 이용하여 삼각형을 그릴 떄 그 값만큼 회전되어 보이게 한다.
-			// Rotate the world matrix by the rotation value so that the triangle will spin.
-			D3DXMatrixRotationY(&_worldMatrix, rotation);
-		}
 
 		// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
 		m_Model->Render(m_D3D->GetDeviceContext());
@@ -694,7 +729,7 @@ bool CGraphicsClass::Render()
 	}
 
 
-	if(TUTORIALTYPE == 17 || TUTORIALTYPE == 18 || TUTORIALTYPE == 19)
+	if(TUTORIALTYPE >= 17 && TUTORIALTYPE <= 21 )
 	{
 		m_Model->Render(m_D3D->GetDeviceContext());
 	}
@@ -780,22 +815,14 @@ bool CGraphicsClass::Render()
 		break;
 	case 20:
 		{
-			// Update the rotation variable each frame.
-			static float rotation = 0.0f;
-
-			rotation += (float)D3DX_PI * 0.0025f;	// 속도 줄이기
-			//rotation += (float)D3DX_PI * 0.01f;
-			if(rotation > 360.0f)
-			{
-				rotation -= 360.0f;
-			}
-
-			// Rotate the world matrix by the rotation value so that the triangle will spin.
-			D3DXMatrixRotationY(&_worldMatrix, rotation);
-
-			m_Model->Render(m_D3D->GetDeviceContext());
-
 			m_pBumpMapShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), _worldMatrix, _viewMatrix, _projectionMatrix, m_Model->GetTextureArray(), m_pLight->GetDirection(), m_pLight->GetDiffuseColor());
+		}
+		break;
+
+	case 21:
+		{
+			m_pSpecMapShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), _worldMatrix, _viewMatrix, _projectionMatrix, m_Model->GetTextureArray(), m_pLight->GetDirection(), m_pLight->GetDiffuseColor(), m_Camera->GetPosition(), m_pLight->GetSpecularColor(), m_pLight->GetSpecularPower());
+
 		}
 		break;
 	}

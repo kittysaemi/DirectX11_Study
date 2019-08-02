@@ -99,6 +99,7 @@
     <ClCompile Include="MultiTextureShader.cpp" />
     <ClCompile Include="Position.cpp" />
     <ClCompile Include="SoundClass.cpp" />
+    <ClCompile Include="SpecMapShader.cpp" />
     <ClCompile Include="SystemClass.cpp" />
     <ClCompile Include="Text.cpp" />
     <ClCompile Include="Texturearray.cpp" />
@@ -128,6 +129,7 @@
     <ClInclude Include="MultiTextureShader.h" />
     <ClInclude Include="Position.h" />
     <ClInclude Include="SoundClass.h" />
+    <ClInclude Include="SpecMapShader.h" />
     <ClInclude Include="SystemClass.h" />
     <ClInclude Include="Text.h" />
     <ClInclude Include="Texturearray.h" />
