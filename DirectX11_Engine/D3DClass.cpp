@@ -649,3 +649,13 @@ void CD3DClass::TurnOffAlphaBlending()
 
 	m_dpDeviceContext->OMSetBlendState(m_DisableABlendingState, blendFactor, 0xffffffff);
 }
+
+ID3D11DepthStencilView * CD3DClass::GetDepthStencilView()
+{
+	return m_dpDepthStencilView;
+}
+
+void CD3DClass::SetBackBufferRenderTarget()
+{
+	m_dpDeviceContext->OMSetRenderTargets(1, &m_dpRenderTargetView, m_dpDepthStencilView);
+}

@@ -33,11 +33,11 @@ bool CSoundClass::Initialize(HWND hWnd)
 		return false;
 
 	// Load a wave audio file onto a secondary buffer.
-	if(!LoadWaveFile("../DirectX11_Engine/data/Star.wav", &m_secondaryBuffer[0]))
-		return false;
-
-	if(!LoadWaveFile("../DirectX11_Engine/data/balloon.wav", &m_secondaryBuffer[1]))
-		return false;
+// 	if(!LoadWaveFile("../DirectX11_Engine/data/Star.wav", &m_secondaryBuffer[0]))
+// 		return false;
+// 
+// 	if(!LoadWaveFile("../DirectX11_Engine/data/balloon.wav", &m_secondaryBuffer[1]))
+// 		return false;
 
 	// Play the wave file now that it has been loaded.
 // 	if(!PlayWaveFile())

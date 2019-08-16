@@ -52,6 +52,10 @@ public:
 	void TurnOnAlphaBlending();
 	void TurnOffAlphaBlending();
 
+	// RTT
+	ID3D11DepthStencilView * GetDepthStencilView();
+	void SetBackBufferRenderTarget();
+
 private:
 	bool m_bVsyncEnable;
 	int m_nVideoCardMemeory;

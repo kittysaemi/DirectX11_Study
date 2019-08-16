@@ -107,7 +107,7 @@ public:
 
 	bool Initialize(ID3D11Device* _device);
 	bool Initialize(ID3D11Device* _device, WCHAR* _filename);	// T5 ~
-	bool Initialize(ID3D11Device* _device, char* _modelfilename, WCHAR* _texurefilename);	// T7
+	bool Initialize(ID3D11Device* _device, char* _modelfilename, WCHAR* _texurefilename, int nTutorialType = 7);	// T7
 	bool Initialize(ID3D11Device* _device, char* _modelfilename, WCHAR* _fileLIst[], int nTutorialType);	// T17 - T20
 	void Shutdown();
 	void Render(ID3D11DeviceContext* _devContext);

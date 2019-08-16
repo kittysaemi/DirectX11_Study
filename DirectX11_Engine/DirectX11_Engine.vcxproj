@@ -44,6 +44,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -84,6 +86,7 @@
     <ClCompile Include="ColorShaderClass.cpp" />
     <ClCompile Include="Cpu.cpp" />
     <ClCompile Include="D3DClass.cpp" />
+    <ClCompile Include="DebugWindow.cpp" />
     <ClCompile Include="FontClass.cpp" />
     <ClCompile Include="FontShader.cpp" />
     <ClCompile Include="Fps.cpp" />
@@ -98,6 +101,7 @@
     <ClCompile Include="ModelList.cpp" />
     <ClCompile Include="MultiTextureShader.cpp" />
     <ClCompile Include="Position.cpp" />
+    <ClCompile Include="RenderTexture.cpp" />
     <ClCompile Include="SoundClass.cpp" />
     <ClCompile Include="SpecMapShader.cpp" />
     <ClCompile Include="SystemClass.cpp" />
@@ -115,6 +119,7 @@
     <ClInclude Include="ColorShaderClass.h" />
     <ClInclude Include="Cpu.h" />
     <ClInclude Include="D3DClass.h" />
+    <ClInclude Include="DebugWindow.h" />
     <ClInclude Include="FontClass.h" />
     <ClInclude Include="FontShader.h" />
     <ClInclude Include="Fps.h" />
@@ -128,6 +133,7 @@
     <ClInclude Include="ModelList.h" />
     <ClInclude Include="MultiTextureShader.h" />
     <ClInclude Include="Position.h" />
+    <ClInclude Include="RenderTexture.h" />
     <ClInclude Include="SoundClass.h" />
     <ClInclude Include="SpecMapShader.h" />
     <ClInclude Include="SystemClass.h" />

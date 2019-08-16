@@ -56,8 +56,9 @@ bool CModelClass::Initialize(ID3D11Device* _device, WCHAR* _filename)
 
 	 return true;
 }
-bool CModelClass::Initialize(ID3D11Device* _device, char* _modelfilename, WCHAR* _texurefilename)
-{
+bool CModelClass::Initialize(ID3D11Device* _device, char* _modelfilename, WCHAR* _texurefilename, int nTutorialType)
+{	
+	m_nTutorialType = nTutorialType;
 	if(!LoadModel(_modelfilename))
 	{
 		return false;
@@ -77,10 +78,11 @@ bool CModelClass::Initialize(ID3D11Device* _device, char* _modelfilename, WCHAR*
 }
 bool CModelClass::Initialize(ID3D11Device* _device, char* _modelfilename, WCHAR* _fileLIst[], int nTutorialType)
 {
+	m_nTutorialType = nTutorialType;
+
 	if(!LoadModel(_modelfilename))
 		return false;
 
-	m_nTutorialType = nTutorialType;
 	if(m_nTutorialType == 20 || m_nTutorialType == 21)
 	{
 		// Calculate the normal, tangent, and binormal vectors for the model.
@@ -295,6 +297,17 @@ bool CModelClass::InitializeBuffers(ID3D11Device* _device)
 			_vertices[i].normal = D3DXVECTOR3(m_pModelType[i].normalvetor[0], m_pModelType[i].normalvetor[1], m_pModelType[i].normalvetor[2]);
 			_vertices[i].tangent = D3DXVECTOR3(m_pModelType[i].tangentvetor[0], m_pModelType[i].tangentvetor[1], m_pModelType[i].tangentvetor[2]);
 			_vertices[i].binormal = D3DXVECTOR3(m_pModelType[i].binormalvetor[0], m_pModelType[i].binormalvetor[1], m_pModelType[i].binormalvetor[2]);
+
+			_indices[i] = i;
+		}
+	}
+	else if(m_nTutorialType == 22)
+	{
+		for(int i=0; i<m_nVertexCount; i++)
+		{
+			_vertices[i].position = D3DXVECTOR3(m_pModelType[i].location[0], m_pModelType[i].location[1], m_pModelType[i].location[2]);
+			_vertices[i].texture = D3DXVECTOR2(m_pModelType[i].texture[0], m_pModelType[i].texture[1]);
+			_vertices[i].normal = D3DXVECTOR3(m_pModelType[i].normalvetor[0], m_pModelType[i].normalvetor[1], m_pModelType[i].normalvetor[2]);
 
 			_indices[i] = i;
 		}

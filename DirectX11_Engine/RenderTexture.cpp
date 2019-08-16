@@ -85,10 +85,7 @@ void CRenderTexture::ClearRenderTarget(ID3D11DeviceContext * devCont, ID3D11Dept
 	// BeginScene 함수와 같으나 백퍼가 아닌 m_renderTargetView에 클리어가 이루어진다.
 	// 매 프레임 RTT가 일어나기 전에 호출
 
-	float color[4];
-	memcpy(color, rgba, sizeof(color[0]));
-
-	devCont->ClearRenderTargetView(m_renderTargetView, color);
+	devCont->ClearRenderTargetView(m_renderTargetView, rgba);
 
 	devCont->ClearDepthStencilView(depthStencilVIew, D3D11_CLEAR_DEPTH, 1.0f, 0);
 }

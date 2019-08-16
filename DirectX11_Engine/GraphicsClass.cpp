@@ -41,6 +41,10 @@ CGraphicsClass::CGraphicsClass(void)
 	// T21
 	m_pSpecMapShader = 0;
 
+	// T22
+	m_pRenderTexture = 0;
+	m_pDebugWindow = 0;
+
 	// saemi	
 	DirectionP[0] = 1.0f;	
 	DirectionP[1] = 1.0f;	
@@ -112,11 +116,9 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 		return false;
 	}
 
-
-
-
 	if(TUTORIALTYPE < 11)
 	{
+#pragma region T11 이전 버전
 
 		// set the initial position of the camera.
 		m_Camera->SetPosition(0, 0, -10);
@@ -154,6 +156,7 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 
 			return true;
 		}
+
 		if(TUTORIALTYPE >= 5 && TUTORIALTYPE <= 6)
 		{	
 			if(!m_Model->Initialize(m_D3D->GetDevice(), L"../DirectX11_Engine/data/seafloor.dds"))	
@@ -223,9 +226,14 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 		// T10 반사광
 		m_pLight->SetSpecularColor(SpecularColor[0], SpecularColor[1], SpecularColor[2], SpecularColor[3]);
 		m_pLight->SetSpecularPower(SpecularPower);
+
+
+#pragma endregion T11 이전 버전
 	}
 	else if(TUTORIALTYPE == 11)
 	{	
+#pragma region T11
+
 		// set the initial position of the camera.
 		m_Camera->SetPosition(0, 0, -10);
 
@@ -244,9 +252,12 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 
 		if(!m_Bitmap->Initialize(m_D3D->GetDevice(), scW, scH, L"../DirectX11_Engine/data/wood.dds", 1200, 800))
 			return false;
+
+		#pragma endregion T11
 	}
 	else if(TUTORIALTYPE >= 12 && TUTORIALTYPE <= 15)
 	{
+#pragma region T12 - T15
 		// set the initial position of the camera.
 		m_Camera->SetPosition(0, 0, -1);
 		m_Camera->Render();
@@ -265,9 +276,11 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 		if(!m_pText->Initialize(m_D3D->GetDevice(), m_D3D->GetDeviceContext(), hWnd, info, baseViewMatrix))
 			return false;
 
+#pragma endregion T12 - T15
 	}
 	else if(TUTORIALTYPE == 16)
 	{
+#pragma region T16
 		// set the initial position of the camera.
 		m_Camera->SetPosition(0.0f, 0.0f, -1.0f);
 		m_Camera->Render();
@@ -320,9 +333,12 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 		m_pFrustum = new CFrustum;
 		if(!m_pFrustum)
 			return false;
+
+#pragma endregion T16
 	}
-	else if(TUTORIALTYPE >= 17)
+	else if(TUTORIALTYPE >= 17 && TUTORIALTYPE <= 21)
 	{
+#pragma region T17 - T21
 		m_Camera->SetPosition(0.0f, 0.0f, -1.0f);
 		m_Camera->Render();
 
@@ -415,6 +431,57 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 				break;
 			}
 		}
+
+#pragma endregion T17 - T21
+	}
+	else if(TUTORIALTYPE >= 22)
+	{
+		m_Model = new CModelClass;
+		if(!m_Model)
+			return false;
+
+		if(!m_Model->Initialize(m_D3D->GetDevice(), "../DirectX11_Engine/data/cube.txt",L"../DirectX11_Engine/data/seafloor.dds" , TUTORIALTYPE))
+			return false;
+
+		m_pLightShader = new CLightshaderClass;
+		if(!m_pLightShader)
+			return false;
+
+		if(!m_pLightShader->Initialize(m_D3D->GetDevice(), hWnd, TUTORIALTYPE))
+			return false;
+
+		m_pLight = new CLightClass;
+		if(!m_pLight)
+			return false;
+
+		m_pLight->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
+		m_pLight->SetDirection(0.0f, 0.0f, 1.0f);
+
+		// RTT 객체 생성
+		m_pRenderTexture = new CRenderTexture;
+		if(!m_pRenderTexture)
+			return false;
+
+		// RTT 객체 초기화
+		if(!m_pRenderTexture->Initialize(m_D3D->GetDevice(), scW, scH))
+			return false;
+
+		// 디버그 윈도우 생성
+		m_pDebugWindow = new CDebugWindow;
+		if(!m_pDebugWindow)
+			return false;
+
+		// 디버그 윈도우 초기화
+		if(!m_pDebugWindow->Initialize(m_D3D->GetDevice(), scW, scH, 100, 100))
+			return false;
+
+		m_TextureShader = new CTextureshaderclass;
+		if(!m_TextureShader)
+			return false;
+
+		if(!m_TextureShader->Initialize(m_D3D->GetDevice(), hWnd))
+			return false;
+
 	}
 	else
 	{
@@ -429,6 +496,21 @@ void CGraphicsClass::Shutdown()
 	// The TextureShaderClass object is also released in the shutdown function.
 	// Release the thing object.
 
+	//////////////////////////////////////////////////////////////////////////
+	// T22
+	if(m_pDebugWindow)
+	{
+		m_pDebugWindow->Shutdown();
+		delete m_pDebugWindow;
+		m_pDebugWindow = 0;
+	}
+	if(m_pRenderTexture)
+	{
+		m_pRenderTexture->Shutdown();
+		delete	m_pRenderTexture;
+		m_pRenderTexture = 0;
+	}
+	
 	//////////////////////////////////////////////////////////////////////////
 	// T21
 	if(m_pSpecMapShader)
@@ -571,7 +653,7 @@ bool CGraphicsClass::Frame(SInputPosInfo data)
 		m_Camera->SetPosition(0.0f, 0.0f, m_pInputData.nRotationZ);
 		m_Camera->SetRotation(m_pInputData.nRotationX, m_pInputData.nRotationY, 0.0f);
 	}
-	else if(TUTORIALTYPE == 17 || TUTORIALTYPE == 19 || TUTORIALTYPE == 21)
+	else if(TUTORIALTYPE == 17 || TUTORIALTYPE == 19 || TUTORIALTYPE == 21 || TUTORIALTYPE == 22)
 	{
 		m_Camera->SetPosition(0.0f, 0.0f, -5.0f);
 	}
@@ -593,14 +675,51 @@ bool CGraphicsClass::Frame(SInputPosInfo data)
 */
 bool CGraphicsClass::Render()
 {
+	if(TUTORIALTYPE == 22)
+	{
+		// 전체 씬을 텍스쳐에 그린다.
+		if(!RenderToTexture())
+			return false;
+
+		m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);	
+
+		// 백버퍼에 평소처럼 전체 씬을 그린다.
+		if(!RenderScene())
+			return false;
+
+		m_D3D->TurnZBufferOff();
+
+		D3DXMATRIX _worldMatrix;
+		m_D3D->GetWorldMatrix(_worldMatrix);
+		D3DXMATRIX _viewMatrix;
+		m_Camera->GetViewMatrix(_viewMatrix);
+		D3DXMATRIX _orthoMatrix;
+		m_D3D->GetOtherMatrix(_orthoMatrix);
+
+		if(!m_pDebugWindow->Render(m_D3D->GetDeviceContext(), 50, 50))
+			return false;
+
+		if(!m_TextureShader->Render(m_D3D->GetDeviceContext(), m_pDebugWindow->GetIndexCount(), _worldMatrix, _viewMatrix, _orthoMatrix, m_pRenderTexture->GetShaderResourceVIew()))
+			return false;
+
+		m_D3D->TurnZBufferOn();
+
+		m_D3D->EndScene();
+
+		return true;
+	}
+
+
+
 	//////////////////////////////////////////////////////////////////////////
 	// T3
 	// Clear the buffers to begin the scene.
 	m_D3D->BeginScene(BGColor[0], BGColor[1], BGColor[2], BGColor[3]);	
 
+
 	//////////////////////////////////////////////////////////////////////////
 	// T4 Start
-	
+
 	// Generate the view matrix based on the camera's position.
 	m_Camera->Render();
 
@@ -616,10 +735,11 @@ bool CGraphicsClass::Render()
 
 	if((TUTORIALTYPE >= 6 && TUTORIALTYPE < 11) || TUTORIALTYPE == 20 || TUTORIALTYPE == 21)
 	{
+#pragma region T6 - T11 || T20 - T21
 		// Update the rotation variable each frame.
 		static float rotation = 0.0f;
 
-		rotation += (float)D3DX_PI * 0.00025f;	// 속도 줄이기
+		rotation += (float)D3DX_PI * 0.005f;	// 속도 줄이기
 		//rotation += (float)D3DX_PI * 0.01f;
 		if(rotation > 360.0f)
 		{
@@ -629,7 +749,9 @@ bool CGraphicsClass::Render()
 		// 월드 행렬을 회전값만큼 회전시켜 이 행렬을 이용하여 삼각형을 그릴 떄 그 값만큼 회전되어 보이게 한다.
 		// Rotate the world matrix by the rotation value so that the triangle will spin.
 		D3DXMatrixRotationY(&_worldMatrix, rotation);
+#pragma endregion
 	}
+
 
 
 	if(TUTORIALTYPE < 11)
@@ -639,24 +761,29 @@ bool CGraphicsClass::Render()
 		m_Model->Render(m_D3D->GetDeviceContext());
 
 
-		// 튜토리얼 버전에 따라, 랜더 방식 변경
+
 		if(TUTORIALTYPE <= 4)
 		{
+#pragma region T4
 			// Render the model using the color shader.
 			if(!m_ColorShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), _worldMatrix, _viewMatrix, _projectionMatrix))
 			{
 				OutputDebugStringA(" Graphics Render / ColorShader Render Faild");
 				return false;
 			}
+#pragma endregion T4
+
 		}
 
 		if(TUTORIALTYPE == 5 )
 		{	
+#pragma region T5
 			// Render the model using the texture shader.
 			if(!m_TextureShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), _worldMatrix, _viewMatrix, _projectionMatrix, m_Model->GetTexture()))
 			{
 				return false;
 			}
+#pragma endregion T5
 		}
 
 		if(TUTORIALTYPE >= 6 && TUTORIALTYPE <= 8)
@@ -684,8 +811,10 @@ bool CGraphicsClass::Render()
 		}
 
 	}
+
 	else if(TUTORIALTYPE >= 11 && TUTORIALTYPE <= 12)
 	{
+#pragma region T11 - T12
 		D3DXMATRIX otherMatrix;
 		m_D3D->GetOtherMatrix(otherMatrix);
 
@@ -715,7 +844,7 @@ bool CGraphicsClass::Render()
 
 			// 마우스 포인터 연결 
 			m_pText->SetMousePosition(m_pInputData.nPosX, m_pInputData.nPosY, m_D3D->GetDeviceContext());
-			
+
 			m_pText->SetKeyBoardInputData(m_D3D->GetDeviceContext(), m_pInputData.sBuffer);
 
 			m_pText->Render(m_D3D->GetDeviceContext(), _worldMatrix, _orthoMatrix);
@@ -728,6 +857,7 @@ bool CGraphicsClass::Render()
 
 		m_D3D->TurnZBufferOn();
 
+#pragma endregion T11 - T12
 	}
 
 
@@ -736,11 +866,12 @@ bool CGraphicsClass::Render()
 		m_Model->Render(m_D3D->GetDeviceContext());
 	}
 
-	
+
 	switch (TUTORIALTYPE)
 	{
 	case 16:
 		{
+#pragma region T16
 			m_pFrustum->ConstructFrustum(SCREEN_DEPTH, _projectionMatrix, _viewMatrix);
 
 			int nModelCnt = m_pModelList->GetModelCount();
@@ -798,6 +929,7 @@ bool CGraphicsClass::Render()
 
 			// Turn the Z buffer back on now that all 2D rendering has completed.
 			m_D3D->TurnZBufferOn();
+#pragma endregion T16		
 		}
 		break;
 	case 17:
@@ -832,6 +964,56 @@ bool CGraphicsClass::Render()
 	// Present the rendered scene to the screen.
 	m_D3D->EndScene();
 	//////////////////////////////////////////////////////////////////////////
+
+
+	return true;
+}
+
+bool CGraphicsClass::RenderToTexture()
+{
+	m_pRenderTexture->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+
+	float rgbAColor[4];
+	rgbAColor[0] = 0.0f;
+	rgbAColor[1] = 0.0f;
+	rgbAColor[2] = 1.0f;
+	rgbAColor[3] = 1.0f;
+
+	m_pRenderTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(),  rgbAColor);
+
+	if(!RenderScene())
+		return false;
+
+	m_D3D->SetBackBufferRenderTarget();
+
+	return true;
+}
+bool CGraphicsClass::RenderScene()
+{
+	m_Camera->Render();
+
+	
+
+	D3DXMATRIX _worldMatrix;
+	m_D3D->GetWorldMatrix(_worldMatrix);
+	D3DXMATRIX _viewMatrix;
+	m_Camera->GetViewMatrix(_viewMatrix);
+	D3DXMATRIX _projectionMatrix;
+	m_D3D->GetProjectionMatrix(_projectionMatrix);
+
+	static float rotation = 0.0f;
+	
+	rotation += (float)D3DX_PI * 0.005f;
+	if(rotation > 360.0f)
+		rotation -= 360.0f;
+
+	D3DXMatrixRotationY(&_worldMatrix, rotation);
+
+	m_Model->Render(m_D3D->GetDeviceContext());
+
+	if(!m_pLightShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), _worldMatrix, _viewMatrix, _projectionMatrix, m_Model->GetTexture(), m_pLight->GetDirection(), m_pLight->GetDiffuseColor()))
+		return false;
+
 	return true;
 }
 

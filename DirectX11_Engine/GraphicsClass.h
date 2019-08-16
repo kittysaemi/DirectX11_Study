@@ -49,13 +49,17 @@
 // tutorial 21
 #include "SpecMapShader.h"
 
+// tutorial 22
+#include "DebugWindow.h"
+#include "RenderTexture.h"
+
 //////////////////////////////////////////////////////////////////////////
 
 const bool FULL_SCREEN = true;//true;
 const bool VSYNC_ENABLED = false;//false;
 const float SCREEN_DEPTH = 1000.0f;
 const float SCREEN_NEAR = 0.1f;
-const int TUTORIALTYPE = 21;
+const int TUTORIALTYPE = 22;
 
 class CGraphicsClass
 {
@@ -111,6 +115,8 @@ public:
 
 private:
 	bool Render();
+	bool RenderToTexture();
+	bool RenderScene();
 
 	// tutorial 3 - T3
 	CD3DClass* m_D3D;
@@ -151,6 +157,10 @@ private:
 
 	// T21
 	CSpecMapShader * m_pSpecMapShader;
+
+	// T22
+	CRenderTexture * m_pRenderTexture;
+	CDebugWindow * m_pDebugWindow;
 
 	// saemi
 	float DirectionP[3];

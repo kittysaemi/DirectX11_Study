@@ -43,12 +43,12 @@ bool CSystemClass::Initialize()
 	if(!m_pGraphics->Initialize(screenX, screenY, m_hwnd))
 		return false;
 
-	m_pSound = new CSoundClass;
-	if(!m_pSound)
-		return false;
-
-	if(!m_pSound->Initialize(m_hwnd))
-		return false;
+// 	m_pSound = new CSoundClass;
+// 	if(!m_pSound)
+// 		return false;
+// 
+// 	if(!m_pSound->Initialize(m_hwnd))
+// 		return false;
 
 	m_pFps = new CFps;
 	if(!m_pFps)
@@ -172,20 +172,20 @@ bool CSystemClass::Frame()
 
 
 	// Sound
-	if(m_pInput->IsPlayStatus(DIK_F1))	// Play
-	{
-		m_pSound->PlayWaveFile();
-	}
-	if(m_pInput->IsPlayStatus(DIK_F2))	// Pause
-	{
-		m_pSound->PauseWaveFIle();
-	}
-	if(m_pInput->IsPlayStatus(DIK_F3))	// Stop
-	{
-		m_pSound->StopWaveFile();
-	}
+// 	if(m_pInput->IsPlayStatus(DIK_F1))	// Play
+// 	{
+// 		m_pSound->PlayWaveFile();
+// 	}
+// 	if(m_pInput->IsPlayStatus(DIK_F2))	// Pause
+// 	{
+// 		m_pSound->PauseWaveFIle();
+// 	}
+// 	if(m_pInput->IsPlayStatus(DIK_F3))	// Stop
+// 	{
+// 		m_pSound->StopWaveFile();
+// 	}
 
-	m_pGraphics->SetPlayStatus(m_pSound->GetPlayStatus());
+	//m_pGraphics->SetPlayStatus(m_pSound->GetPlayStatus());
 
 	// T13
 	if(!m_pInput->Frame())
