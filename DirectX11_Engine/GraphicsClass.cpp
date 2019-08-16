@@ -440,7 +440,7 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 		if(!m_Model)
 			return false;
 
-		if(!m_Model->Initialize(m_D3D->GetDevice(), "../DirectX11_Engine/data/cube.txt",L"../DirectX11_Engine/data/seafloor.dds" , TUTORIALTYPE))
+		if(!m_Model->Initialize(m_D3D->GetDevice(), "Data.txt",L"DDS.dds" , TUTORIALTYPE))
 			return false;
 
 		m_pLightShader = new CLightshaderClass;
@@ -472,7 +472,7 @@ bool CGraphicsClass::Initialize(int scW, int scH, HWND hWnd)
 			return false;
 
 		// 디버그 윈도우 초기화
-		if(!m_pDebugWindow->Initialize(m_D3D->GetDevice(), scW, scH, 100, 100))
+		if(!m_pDebugWindow->Initialize(m_D3D->GetDevice(), scW, scH, scW * (scH * 0.1) / scH, scH * (scW * 0.1) / scW))
 			return false;
 
 		m_TextureShader = new CTextureshaderclass;
@@ -655,7 +655,7 @@ bool CGraphicsClass::Frame(SInputPosInfo data)
 	}
 	else if(TUTORIALTYPE == 17 || TUTORIALTYPE == 19 || TUTORIALTYPE == 21 || TUTORIALTYPE == 22)
 	{
-		m_Camera->SetPosition(0.0f, 0.0f, -5.0f);
+		m_Camera->SetPosition(0.0f, 0.0f, -10.0f);
 	}
 
 	if(!Render())
